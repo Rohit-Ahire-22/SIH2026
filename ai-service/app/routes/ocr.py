@@ -1,8 +1,11 @@
+import time
+import logging
 from fastapi import APIRouter, File, HTTPException, UploadFile, Form
 
 from app.services.ocr_service import run_ocr
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 ALLOWED_CONTENT_TYPES = {
     "image/jpeg",
@@ -19,6 +22,9 @@ def ocr_image(
     image: UploadFile = File(...),
     variant: str = Form("original")
 ) -> dict:
+    t0 = time.time()
+    logger.info("OCR request received")
+    
     if not image or not image.filename:
         raise HTTPException(status_code=400, detail="No image file uploaded")
 
@@ -49,6 +55,9 @@ def ocr_image(
     except Exception as exc:
         raise HTTPException(status_code=500, detail="OCR processing failed") from exc
 
+    t_total = time.time()
+    logger.info(f"Total request duration: {t_total - t0:.2f}s")
+    
     return {
         "success": True,
         "count": len(results),

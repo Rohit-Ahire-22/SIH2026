@@ -1,12 +1,20 @@
 import os
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, Header, HTTPException, status
 
 from app.routes.ocr import router as ocr_router
+from app.services.ocr_service import initialize_ocr
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    initialize_ocr()
+    yield
 
 app = FastAPI(
     title="SIH26034 AI Service",
     description="AI service for the SIH26034 Packaged Commodity Compliance System",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 def verify_service_key(x_ai_service_key: str = Header(None)):
