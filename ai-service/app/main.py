@@ -17,20 +17,24 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+import logging
+logger = logging.getLogger(__name__)
+
 def verify_service_key(x_ai_service_key: str = Header(None)):
     expected_key = os.environ.get("AI_SERVICE_API_KEY")
     if not expected_key:
-        # If no key is configured in the environment, we might want to fail closed.
-        # But for local dev it might be empty. We should enforce it.
+        logger.error("API-key validation: FAIL (no expected key)")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="AI service is improperly configured (missing API key)",
         )
     if x_ai_service_key != expected_key:
+        logger.error("API-key validation: FAIL (mismatch)")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid service key",
         )
+    logger.info("API-key validation: PASS")
 
 app.include_router(ocr_router, dependencies=[Depends(verify_service_key)])
 
