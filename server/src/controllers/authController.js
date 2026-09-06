@@ -88,7 +88,7 @@ export async function login(req, res, next) {
     res.cookie('jwt', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict', // Protects against CSRF given strict CORS
+      sameSite: 'none', // Protects against CSRF given strict CORS
       maxAge: 12 * 60 * 60 * 1000 // 12 hours
     });
 
@@ -133,7 +133,7 @@ export async function logout(req, res) {
   res.clearCookie('jwt', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
+    sameSite: 'none'
   });
   return res.status(200).json({
     success: true,
