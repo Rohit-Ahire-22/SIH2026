@@ -1,4 +1,8 @@
 import os
+# Force PaddleOCR/OpenMP to use a single thread to prevent CPU starvation on Render Free
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, Header, HTTPException, status
 

@@ -79,6 +79,9 @@ export async function runOcrOnImageBuffer(imageBuffer, mimeType, variant = 'orig
   form.append('variant', variant)
 
   const endpoint = `${config.aiServiceUrl.replace(/\/+$/, '')}/ocr`
+  
+  console.log(`[DEBUG OCR] Initiating POST to ${endpoint}`)
+  const startTime = Date.now()
 
   let response
   try {
@@ -109,11 +112,14 @@ export async function runOcrOnImageBuffer(imageBuffer, mimeType, variant = 'orig
 
   const text = await response.text()
   const contentType = response.headers.get('content-type') || ''
+  const duration = Date.now() - startTime
   
   // SAFE DIAGNOSTIC LOGGING (NO CREDENTIALS)
   console.log('[DEBUG OCR] POST', endpoint)
+  console.log('[DEBUG OCR] Duration:', `${duration}ms`)
   console.log('[DEBUG OCR] Status:', response.status)
   console.log('[DEBUG OCR] Content-Type:', contentType)
+  console.log('[DEBUG OCR] Body length:', text.length)
   console.log('[DEBUG OCR] Body preview:', text.substring(0, 200).replace(/\n/g, ' '))
 
   let payload
