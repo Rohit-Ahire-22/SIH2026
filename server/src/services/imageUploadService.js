@@ -64,8 +64,9 @@ export async function uploadProductImageToCloudinary(buffer, originalFilename) {
 }
 
 function buildPublicId(originalFilename) {
-  if (!originalFilename) return undefined
+  const timestamp = Date.now()
+  if (!originalFilename) return `${timestamp}`
   const stem = originalFilename.replace(/\.[^.]+$/, '')
   const safe = stem.replace(/[^a-zA-Z0-9_-]/g, '-').toLowerCase()
-  return safe || undefined
+  return safe ? `${safe}-${timestamp}` : `${timestamp}`
 }
