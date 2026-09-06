@@ -31,10 +31,13 @@ export function assertOcrServiceConfigured() {
 }
 
 export async function runOcrOnImageUrl(imageUrl, mimeType) {
+  console.log(`[DEBUG OCR FLOW] runOcrOnImageUrl started for: ${imageUrl}`)
   assertOcrServiceConfigured()
 
   const resolvedMimeType = resolveMimeType(mimeType, imageUrl)
+  console.log(`[DEBUG OCR FLOW] image URL fetched, starting download...`)
   const imageBuffer = await fetchRemoteImage(imageUrl)
+  console.log(`[DEBUG OCR FLOW] image bytes received (size: ${imageBuffer.length} bytes)`)
   return runOcrOnImageBuffer(imageBuffer, resolvedMimeType)
 }
 
@@ -80,7 +83,7 @@ export async function runOcrOnImageBuffer(imageBuffer, mimeType, variant = 'orig
 
   const endpoint = `${config.aiServiceUrl.replace(/\/+$/, '')}/ocr`
   
-  console.log(`[DEBUG OCR] Initiating POST to ${endpoint}`)
+  console.log(`[DEBUG OCR FLOW] calling AI endpoint: ${endpoint}`)
   const startTime = Date.now()
 
   let response
