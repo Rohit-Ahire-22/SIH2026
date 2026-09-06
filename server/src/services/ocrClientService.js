@@ -86,7 +86,9 @@ export async function runOcrOnImageBuffer(imageBuffer, mimeType, variant = 'orig
       method: 'POST',
       body: form,
       headers: {
-        'X-AI-Service-Key': process.env.AI_SERVICE_API_KEY || ''
+        'X-AI-Service-Key': process.env.AI_SERVICE_API_KEY || '',
+        'Accept': 'application/json',
+        'User-Agent': 'SIH-Backend-Client/1.0'
       },
       signal: AbortSignal.timeout(config.ocrServiceTimeoutMs),
     })
@@ -107,10 +109,20 @@ export async function runOcrOnImageBuffer(imageBuffer, mimeType, variant = 'orig
 
   let payload
   try {
-    payload = await response.json()
-  } catch {
+    const text = await response.text()
+    
+    // SAFE DIAGNOSTIC LOGGING (NO CREDENTIALS)
+    console.log('[DEBUG OCR] POST', endpoint)
+    console.log('[DEBUG OCR] Status:', response.status)
+    console.log('[DEBUG OCR] Content-Type:', response.headers.get('content-type'))
+    console.log('[DEBUG OCR] Body preview:', text.substring(0, 200).replace(/\n/g, ' '))
+    
+    payload = JSON.parse(text)
+  } catch (err) {
+    console.error('[DEBUG OCR] JSON parse failed:', err.message)
+    const preview = text ? text.substring(0, 100).replace(/\n/g, ' ') : 'empty response'
     throw buildOcrError(
-      'OCR service returned a non-JSON response',
+      `OCR service returned a non-JSON response (Status ${response.status}): ${preview}`,
       502,
       'OCR_MALFORMED_RESPONSE',
     )
