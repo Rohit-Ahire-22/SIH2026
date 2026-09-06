@@ -9,6 +9,7 @@ import routes from './routes/index.js'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js'
 
 const app = express()
+app.set('trust proxy', 1)
 
 // Security headers
 app.use(helmet())
