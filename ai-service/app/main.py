@@ -33,7 +33,12 @@ def verify_service_key(x_ai_service_key: str = Header(None)):
             detail="AI service is improperly configured (missing API key)",
         )
     if x_ai_service_key != expected_key:
-        logger.error("API-key validation: FAIL (mismatch)")
+        provided_len = len(x_ai_service_key) if x_ai_service_key else 0
+        expected_len = len(expected_key) if expected_key else 0
+        logger.error(
+            f"API-key validation: FAIL (mismatch). "
+            f"Provided length: {provided_len}, Expected length: {expected_len}"
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid service key",
