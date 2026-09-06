@@ -25,6 +25,7 @@ def get_ocr() -> PaddleOCR:
                 # Use lighter default models by specifying lang and disabling heavy features
                 _ocr = PaddleOCR(
                     lang="en",
+                    ocr_version="PP-OCRv4",
                     use_doc_orientation_classify=False,
                     use_doc_unwarping=False,
                     use_textline_orientation=False,
