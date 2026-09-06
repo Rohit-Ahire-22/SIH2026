@@ -107,16 +107,20 @@ export async function runOcrOnImageBuffer(imageBuffer, mimeType, variant = 'orig
     )
   }
 
+  const text = await response.text()
+  const contentType = response.headers.get('content-type') || ''
+  
+  // SAFE DIAGNOSTIC LOGGING (NO CREDENTIALS)
+  console.log('[DEBUG OCR] POST', endpoint)
+  console.log('[DEBUG OCR] Status:', response.status)
+  console.log('[DEBUG OCR] Content-Type:', contentType)
+  console.log('[DEBUG OCR] Body preview:', text.substring(0, 200).replace(/\n/g, ' '))
+
   let payload
   try {
-    const text = await response.text()
-    
-    // SAFE DIAGNOSTIC LOGGING (NO CREDENTIALS)
-    console.log('[DEBUG OCR] POST', endpoint)
-    console.log('[DEBUG OCR] Status:', response.status)
-    console.log('[DEBUG OCR] Content-Type:', response.headers.get('content-type'))
-    console.log('[DEBUG OCR] Body preview:', text.substring(0, 200).replace(/\n/g, ' '))
-    
+    if (!contentType.includes('application/json')) {
+      throw new Error(`Invalid Content-Type: ${contentType}`)
+    }
     payload = JSON.parse(text)
   } catch (err) {
     console.error('[DEBUG OCR] JSON parse failed:', err.message)
