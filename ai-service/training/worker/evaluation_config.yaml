@@ -1,0 +1,13 @@
+# Engineering Defaults for YOLO Model Evaluation Quality Gates
+# These thresholds define the strict regression protection limits between candidate and champion models.
+quality_gates:
+  absolute:
+    min_mAP50: 0.70
+    min_mAP50_95: 0.50
+    min_precision: 0.75
+    min_recall: 0.75
+  regression_tolerance:
+    max_mAP50_drop: 0.05
+    max_mAP50_95_drop: 0.03
+    max_precision_drop: 0.05
+    max_recall_drop: 0.05

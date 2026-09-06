@@ -1,0 +1,253 @@
+{
+  "generatedAt": "2026-09-05T18:06:35.499Z",
+  "dataset": {
+    "productsDiscovered": 10,
+    "imagesDiscovered": 20,
+    "frontCount": 10,
+    "backCount": 10,
+    "validProducts": 10,
+    "invalidProducts": 0,
+    "warnings": false,
+    "exactDuplicates": 0,
+    "nearDuplicates": 0
+  },
+  "imageQuality": {
+    "avgWidth": 1292.3,
+    "avgHeight": 1118.25,
+    "avgMegapixels": 1.53956885,
+    "avgBrightness": 157.79238858403124
+  },
+  "ocr": {
+    "detectionCount": 0,
+    "averageConfidence": 0,
+    "frontCount": 0,
+    "backCount": 0
+  },
+  "extraction": {
+    "mrp": {
+      "detected": 0,
+      "missing": 0,
+      "uncertain": 10
+    },
+    "netQuantity": {
+      "detected": 0,
+      "missing": 0,
+      "uncertain": 10
+    },
+    "batchLotNumber": {
+      "detected": 0,
+      "missing": 0,
+      "uncertain": 10
+    },
+    "dateOfManufacture": {
+      "detected": 0,
+      "missing": 0,
+      "uncertain": 10
+    },
+    "dateOfPacking": {
+      "detected": 0,
+      "missing": 0,
+      "uncertain": 10
+    },
+    "expiryOrUseByDate": {
+      "detected": 0,
+      "missing": 0,
+      "uncertain": 10
+    },
+    "countryOfOrigin": {
+      "detected": 0,
+      "missing": 0,
+      "uncertain": 10
+    },
+    "manufacturerName": {
+      "detected": 0,
+      "missing": 0,
+      "uncertain": 10
+    },
+    "consumerCareDetails": {
+      "detected": 0,
+      "missing": 0,
+      "uncertain": 10
+    }
+  },
+  "category": {
+    "unknown": 10
+  },
+  "compliance": {
+    "PASS": 0,
+    "FAIL": 0,
+    "REVIEW": 10
+  },
+  "productReports": [
+    {
+      "productId": "product_001",
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "finalComplianceStatus": "REVIEW",
+      "fields": {
+        "mrp": null,
+        "netQuantity": null,
+        "batchLotNumber": null,
+        "dateOfManufacture": null,
+        "dateOfPacking": null,
+        "expiryOrUseByDate": null,
+        "countryOfOrigin": null,
+        "manufacturerName": null,
+        "consumerCareDetails": null
+      }
+    },
+    {
+      "productId": "product_002",
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "finalComplianceStatus": "REVIEW",
+      "fields": {
+        "mrp": null,
+        "netQuantity": null,
+        "batchLotNumber": null,
+        "dateOfManufacture": null,
+        "dateOfPacking": null,
+        "expiryOrUseByDate": null,
+        "countryOfOrigin": null,
+        "manufacturerName": null,
+        "consumerCareDetails": null
+      }
+    },
+    {
+      "productId": "product_003",
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "finalComplianceStatus": "REVIEW",
+      "fields": {
+        "mrp": null,
+        "netQuantity": null,
+        "batchLotNumber": null,
+        "dateOfManufacture": null,
+        "dateOfPacking": null,
+        "expiryOrUseByDate": null,
+        "countryOfOrigin": null,
+        "manufacturerName": null,
+        "consumerCareDetails": null
+      }
+    },
+    {
+      "productId": "product_004",
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "finalComplianceStatus": "REVIEW",
+      "fields": {
+        "mrp": null,
+        "netQuantity": null,
+        "batchLotNumber": null,
+        "dateOfManufacture": null,
+        "dateOfPacking": null,
+        "expiryOrUseByDate": null,
+        "countryOfOrigin": null,
+        "manufacturerName": null,
+        "consumerCareDetails": null
+      }
+    },
+    {
+      "productId": "product_005",
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "finalComplianceStatus": "REVIEW",
+      "fields": {
+        "mrp": null,
+        "netQuantity": null,
+        "batchLotNumber": null,
+        "dateOfManufacture": null,
+        "dateOfPacking": null,
+        "expiryOrUseByDate": null,
+        "countryOfOrigin": null,
+        "manufacturerName": null,
+        "consumerCareDetails": null
+      }
+    },
+    {
+      "productId": "product_006",
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "finalComplianceStatus": "REVIEW",
+      "fields": {
+        "mrp": null,
+        "netQuantity": null,
+        "batchLotNumber": null,
+        "dateOfManufacture": null,
+        "dateOfPacking": null,
+        "expiryOrUseByDate": null,
+        "countryOfOrigin": null,
+        "manufacturerName": null,
+        "consumerCareDetails": null
+      }
+    },
+    {
+      "productId": "product_007",
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "finalComplianceStatus": "REVIEW",
+      "fields": {
+        "mrp": null,
+        "netQuantity": null,
+        "batchLotNumber": null,
+        "dateOfManufacture": null,
+        "dateOfPacking": null,
+        "expiryOrUseByDate": null,
+        "countryOfOrigin": null,
+        "manufacturerName": null,
+        "consumerCareDetails": null
+      }
+    },
+    {
+      "productId": "product_008",
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "finalComplianceStatus": "REVIEW",
+      "fields": {
+        "mrp": null,
+        "netQuantity": null,
+        "batchLotNumber": null,
+        "dateOfManufacture": null,
+        "dateOfPacking": null,
+        "expiryOrUseByDate": null,
+        "countryOfOrigin": null,
+        "manufacturerName": null,
+        "consumerCareDetails": null
+      }
+    },
+    {
+      "productId": "product_009",
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "finalComplianceStatus": "REVIEW",
+      "fields": {
+        "mrp": null,
+        "netQuantity": null,
+        "batchLotNumber": null,
+        "dateOfManufacture": null,
+        "dateOfPacking": null,
+        "expiryOrUseByDate": null,
+        "countryOfOrigin": null,
+        "manufacturerName": null,
+        "consumerCareDetails": null
+      }
+    },
+    {
+      "productId": "product_010",
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "finalComplianceStatus": "REVIEW",
+      "fields": {
+        "mrp": null,
+        "netQuantity": null,
+        "batchLotNumber": null,
+        "dateOfManufacture": null,
+        "dateOfPacking": null,
+        "expiryOrUseByDate": null,
+        "countryOfOrigin": null,
+        "manufacturerName": null,
+        "consumerCareDetails": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "auditVersion": "1.0",
+  "timestamp": "2026-09-05T22:11:00Z",
+  "sources": [
+    {
+      "sourceId": "proprietary_smartphone",
+      "status": "APPROVED",
+      "license": "proprietary",
+      "intendedUse": ["GROUND_TRUTH", "TRAINING", "VALIDATION", "TEST"],
+      "restrictions": "None for internal SIH use."
+    },
+    {
+      "sourceId": "open_food_facts",
+      "status": "CONDITIONAL",
+      "license": "CC-BY-SA 3.0",
+      "intendedUse": ["PRETRAINING_SUPPORT"],
+      "restrictions": "Must attribute source. If models/datasets are distributed, ShareAlike obligations apply. Do NOT mix with proprietary ground truth."
+    },
+    {
+      "sourceId": "amazon_in",
+      "status": "REJECTED",
+      "license": "all_rights_reserved",
+      "intendedUse": [],
+      "restrictions": "Terms of Service prohibits automated scraping; images are copyrighted."
+    },
+    {
+      "sourceId": "flipkart",
+      "status": "REJECTED",
+      "license": "all_rights_reserved",
+      "intendedUse": [],
+      "restrictions": "Terms of Service prohibits automated scraping; images are copyrighted."
+    },
+    {
+      "sourceId": "google_images",
+      "status": "REJECTED",
+      "license": "unknown",
+      "intendedUse": [],
+      "restrictions": "Unknown provenance and copyright status."
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "datasetVersion": "dataset-v1",
+  "splitStrategy": "product_level",
+  "generatedAt": "2026-09-05T18:04:05.136Z",
+  "baseline_integration_dataset": {
+    "products": [
+      "product_001",
+      "product_002",
+      "product_003",
+      "product_004",
+      "product_005",
+      "product_006",
+      "product_007",
+      "product_008",
+      "product_009",
+      "product_010"
+    ],
+    "images": [
+      "b5ef883c-d43e-401c-9300-720b8c37279e",
+      "66ec07b3-b849-4793-ae13-12ad83e9f694",
+      "ea412381-f7e6-4825-a6a7-9c91a1b3beca",
+      "69365d83-c940-4b41-9ff3-1582e959d01a",
+      "02a4680a-c5d9-4baa-847d-3b122882b6cd",
+      "fcce1ac4-b37e-4d7d-a622-822afb35eda6",
+      "889571b6-aa83-4ff3-ae2c-9a254532a92d",
+      "0523e6c0-4982-4a13-8bd8-7aa15645b10a",
+      "a48c1b7e-418a-45e7-b103-53e95bc15eef",
+      "0a3edfda-9188-4e4b-8d6a-638b69aa3c59",
+      "0f95d50c-9075-43b5-b812-aeffc8ce58c9",
+      "c9719d9c-6283-482c-bcca-67f33be880a4",
+      "bc4ae4f3-3cb9-49ad-b6cb-7b944d027d7d",
+      "a1858efd-d9bd-4ed3-a764-33e702f01e65",
+      "16a0e156-77e5-47f1-a279-eb035599526c",
+      "a4dd56c7-1570-4d83-8516-f85562360d7d",
+      "0d58ffc3-a86a-4d19-80ab-d8278ed0cc18",
+      "dd98aaad-174a-47a7-bde1-55b3994b946c",
+      "1e85ff6f-bd30-4ba9-98ba-9e15adde4915",
+      "a26689ed-1a33-4159-b7c6-96ffb2d31109"
+    ]
+  },
+  "train": {
+    "products": [],
+    "images": []
+  },
+  "validation": {
+    "products": [],
+    "images": []
+  },
+  "test": {
+    "products": [],
+    "images": []
+  }
+}

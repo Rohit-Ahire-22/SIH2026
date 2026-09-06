@@ -1,0 +1,771 @@
+{
+  "generatedAt": "2026-09-05T19:12:49.928Z",
+  "dataset": {
+    "productsProcessed": 10,
+    "imagesProcessed": 20,
+    "frontImages": 10,
+    "backImages": 10
+  },
+  "performance": {
+    "totalRuntimeMs": 2235881,
+    "averageLatencyMs": 111789.9
+  },
+  "ocr": {
+    "imagesAttempted": 20,
+    "successfulImages": 18,
+    "failedImages": 2,
+    "timeoutImages": 0,
+    "detectionCount": 614,
+    "averageConfidence": 0.8792345786182034,
+    "medianConfidence": 0.9678792953491211,
+    "minConfidence": 0.18905936181545258,
+    "maxConfidence": 0.9999987483024597,
+    "frontStatistics": {
+      "detections": 76,
+      "averageConfidence": 0.9472479737902942
+    },
+    "backStatistics": {
+      "detections": 538,
+      "averageConfidence": 0.8696267384080195
+    }
+  },
+  "extraction": {
+    "mrp": {
+      "detected": 0,
+      "missing": 8,
+      "uncertain": 2
+    },
+    "netQuantity": {
+      "detected": 1,
+      "missing": 7,
+      "uncertain": 2
+    },
+    "batchLotNumber": {
+      "detected": 2,
+      "missing": 7,
+      "uncertain": 1
+    },
+    "dateOfManufacture": {
+      "detected": 0,
+      "missing": 8,
+      "uncertain": 2
+    },
+    "dateOfPacking": {
+      "detected": 0,
+      "missing": 8,
+      "uncertain": 2
+    },
+    "expiryOrUseByDate": {
+      "detected": 0,
+      "missing": 8,
+      "uncertain": 2
+    },
+    "countryOfOrigin": {
+      "detected": 1,
+      "missing": 8,
+      "uncertain": 1
+    },
+    "manufacturerName": {
+      "detected": 2,
+      "missing": 6,
+      "uncertain": 2
+    },
+    "consumerCareDetails": {
+      "detected": 0,
+      "missing": 8,
+      "uncertain": 2
+    }
+  },
+  "category": {
+    "unknown": 10
+  },
+  "compliance": {
+    "PASS": 0,
+    "FAIL": 1,
+    "REVIEW": 9,
+    "PENDING": 0
+  },
+  "products": [
+    {
+      "productId": "product_001",
+      "frontImage": "dataset/raw/proprietary/product_001/front.jpeg",
+      "backImage": "dataset/raw/proprietary/product_001/back.jpeg",
+      "ocrSummary": {
+        "totalDetections": 95
+      },
+      "extractedFields": {
+        "mrp": {
+          "value": null,
+          "trace": null
+        },
+        "netQuantity": {
+          "value": null,
+          "trace": null
+        },
+        "batchLotNumber": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfManufacture": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfPacking": {
+          "value": null,
+          "trace": null
+        },
+        "expiryOrUseByDate": {
+          "value": null,
+          "trace": null
+        },
+        "countryOfOrigin": {
+          "value": null,
+          "trace": null
+        },
+        "manufacturerName": {
+          "value": null,
+          "trace": null
+        },
+        "consumerCareDetails": {
+          "value": null,
+          "trace": null
+        }
+      },
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "applicability": {
+        "rule6": "APPLICABLE",
+        "rule789": "APPLICABLE",
+        "rule11": "APPLICABLE"
+      },
+      "compliance": "REVIEW"
+    },
+    {
+      "productId": "product_002",
+      "frontImage": "dataset/raw/proprietary/product_002/front.jpeg",
+      "backImage": "dataset/raw/proprietary/product_002/back.jpeg",
+      "ocrSummary": {
+        "totalDetections": 8
+      },
+      "extractedFields": {
+        "mrp": {
+          "value": null,
+          "trace": null
+        },
+        "netQuantity": {
+          "value": null,
+          "trace": null
+        },
+        "batchLotNumber": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfManufacture": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfPacking": {
+          "value": null,
+          "trace": null
+        },
+        "expiryOrUseByDate": {
+          "value": null,
+          "trace": null
+        },
+        "countryOfOrigin": {
+          "value": null,
+          "trace": null
+        },
+        "manufacturerName": {
+          "value": null,
+          "trace": null
+        },
+        "consumerCareDetails": {
+          "value": null,
+          "trace": null
+        }
+      },
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "applicability": {
+        "rule6": "APPLICABLE",
+        "rule789": "APPLICABLE",
+        "rule11": "APPLICABLE"
+      },
+      "compliance": "REVIEW"
+    },
+    {
+      "productId": "product_003",
+      "frontImage": "dataset/raw/proprietary/product_003/front.jpg",
+      "backImage": "dataset/raw/proprietary/product_003/back.jpg",
+      "ocrSummary": {
+        "totalDetections": 85
+      },
+      "extractedFields": {
+        "mrp": {
+          "value": null,
+          "trace": null
+        },
+        "netQuantity": {
+          "value": {
+            "value": 70,
+            "unit": "g"
+          },
+          "trace": {
+            "sourceImage": "dataset/raw/proprietary/product_003/back.jpg",
+            "sourceView": "back",
+            "sourceText": "NET WEIGHT: 70g+10g*Extra= 80g",
+            "sourceConfidence": 0.9778658747673035,
+            "sourceBoundingBox": [
+              [
+                823,
+                272
+              ],
+              [
+                1225,
+                272
+              ],
+              [
+                1225,
+                317
+              ],
+              [
+                823,
+                317
+              ]
+            ]
+          }
+        },
+        "batchLotNumber": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfManufacture": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfPacking": {
+          "value": null,
+          "trace": null
+        },
+        "expiryOrUseByDate": {
+          "value": null,
+          "trace": null
+        },
+        "countryOfOrigin": {
+          "value": null,
+          "trace": null
+        },
+        "manufacturerName": {
+          "value": null,
+          "trace": null
+        },
+        "consumerCareDetails": {
+          "value": null,
+          "trace": null
+        }
+      },
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "applicability": {
+        "rule6": "APPLICABLE",
+        "rule789": "APPLICABLE",
+        "rule11": "APPLICABLE"
+      },
+      "compliance": "FAIL"
+    },
+    {
+      "productId": "product_004",
+      "frontImage": "dataset/raw/proprietary/product_004/front.jpg",
+      "backImage": "dataset/raw/proprietary/product_004/back.png",
+      "ocrSummary": {
+        "totalDetections": 97
+      },
+      "extractedFields": {
+        "mrp": {
+          "value": null,
+          "trace": null
+        },
+        "netQuantity": {
+          "value": null,
+          "trace": null
+        },
+        "batchLotNumber": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfManufacture": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfPacking": {
+          "value": null,
+          "trace": null
+        },
+        "expiryOrUseByDate": {
+          "value": null,
+          "trace": null
+        },
+        "countryOfOrigin": {
+          "value": null,
+          "trace": null
+        },
+        "manufacturerName": {
+          "value": null,
+          "trace": null
+        },
+        "consumerCareDetails": {
+          "value": null,
+          "trace": null
+        }
+      },
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "applicability": {
+        "rule6": "APPLICABLE",
+        "rule789": "APPLICABLE",
+        "rule11": "APPLICABLE"
+      },
+      "compliance": "REVIEW"
+    },
+    {
+      "productId": "product_005",
+      "frontImage": "dataset/raw/proprietary/product_005/front.jpeg",
+      "backImage": "dataset/raw/proprietary/product_005/back.jpg",
+      "ocrSummary": {
+        "totalDetections": 35
+      },
+      "extractedFields": {
+        "mrp": {
+          "value": null,
+          "trace": null
+        },
+        "netQuantity": {
+          "value": null,
+          "trace": null
+        },
+        "batchLotNumber": {
+          "value": "and see address panel below",
+          "trace": {
+            "sourceImage": "dataset/raw/proprietary/product_005/back.jpg",
+            "sourceView": "back",
+            "sourceText": "Batch No. and see address panel below",
+            "sourceConfidence": 0.8670312762260437,
+            "sourceBoundingBox": [
+              [
+                470,
+                462
+              ],
+              [
+                604,
+                462
+              ],
+              [
+                604,
+                475
+              ],
+              [
+                470,
+                475
+              ]
+            ]
+          }
+        },
+        "dateOfManufacture": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfPacking": {
+          "value": null,
+          "trace": null
+        },
+        "expiryOrUseByDate": {
+          "value": null,
+          "trace": null
+        },
+        "countryOfOrigin": {
+          "value": null,
+          "trace": null
+        },
+        "manufacturerName": {
+          "value": null,
+          "trace": null
+        },
+        "consumerCareDetails": {
+          "value": null,
+          "trace": null
+        }
+      },
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "applicability": {
+        "rule6": "APPLICABLE",
+        "rule789": "APPLICABLE",
+        "rule11": "APPLICABLE"
+      },
+      "compliance": "REVIEW"
+    },
+    {
+      "productId": "product_006",
+      "frontImage": "dataset/raw/proprietary/product_006/front.jpg",
+      "backImage": "dataset/raw/proprietary/product_006/back.jpg",
+      "ocrSummary": {
+        "totalDetections": 65
+      },
+      "extractedFields": {
+        "mrp": {
+          "value": null,
+          "trace": null
+        },
+        "netQuantity": {
+          "value": null,
+          "trace": null
+        },
+        "batchLotNumber": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfManufacture": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfPacking": {
+          "value": null,
+          "trace": null
+        },
+        "expiryOrUseByDate": {
+          "value": null,
+          "trace": null
+        },
+        "countryOfOrigin": {
+          "value": null,
+          "trace": null
+        },
+        "manufacturerName": {
+          "value": null,
+          "trace": null
+        },
+        "consumerCareDetails": {
+          "value": null,
+          "trace": null
+        }
+      },
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "applicability": {
+        "rule6": "APPLICABLE",
+        "rule789": "APPLICABLE",
+        "rule11": "APPLICABLE"
+      },
+      "compliance": "REVIEW"
+    },
+    {
+      "productId": "product_007",
+      "frontImage": "dataset/raw/proprietary/product_007/front.png",
+      "backImage": "dataset/raw/proprietary/product_007/back.jpg",
+      "ocrSummary": {
+        "totalDetections": 69
+      },
+      "extractedFields": {
+        "mrp": {
+          "value": null,
+          "trace": null
+        },
+        "netQuantity": {
+          "value": null,
+          "trace": null
+        },
+        "batchLotNumber": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfManufacture": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfPacking": {
+          "value": null,
+          "trace": null
+        },
+        "expiryOrUseByDate": {
+          "value": null,
+          "trace": null
+        },
+        "countryOfOrigin": {
+          "value": null,
+          "trace": null
+        },
+        "manufacturerName": {
+          "value": "TATA CHEMICALS LIMITED",
+          "trace": {
+            "sourceImage": "dataset/raw/proprietary/product_007/back.jpg",
+            "sourceView": "back",
+            "sourceText": "Manufactured by: TATA CHEMICALS LIMITED",
+            "sourceConfidence": 0.9922195076942444,
+            "sourceBoundingBox": [
+              [
+                602,
+                278
+              ],
+              [
+                741,
+                278
+              ],
+              [
+                741,
+                293
+              ],
+              [
+                602,
+                293
+              ]
+            ]
+          }
+        },
+        "consumerCareDetails": {
+          "value": null,
+          "trace": null
+        }
+      },
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "applicability": {
+        "rule6": "APPLICABLE",
+        "rule789": "APPLICABLE",
+        "rule11": "APPLICABLE"
+      },
+      "compliance": "REVIEW"
+    },
+    {
+      "productId": "product_008",
+      "frontImage": "dataset/raw/proprietary/product_008/front.jpg",
+      "backImage": "dataset/raw/proprietary/product_008/back.jpg",
+      "ocrSummary": {
+        "totalDetections": 65
+      },
+      "extractedFields": {
+        "mrp": {
+          "value": null,
+          "trace": null
+        },
+        "netQuantity": {
+          "value": null,
+          "trace": null
+        },
+        "batchLotNumber": {
+          "value": "No",
+          "trace": {
+            "sourceImage": "dataset/raw/proprietary/product_008/back.jpg",
+            "sourceView": "back",
+            "sourceText": "ITCCARESAPO.BONO.592",
+            "sourceConfidence": 0.813484787940979,
+            "sourceBoundingBox": [
+              [
+                373,
+                379
+              ],
+              [
+                470,
+                379
+              ],
+              [
+                470,
+                398
+              ],
+              [
+                373,
+                398
+              ]
+            ]
+          }
+        },
+        "dateOfManufacture": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfPacking": {
+          "value": null,
+          "trace": null
+        },
+        "expiryOrUseByDate": {
+          "value": null,
+          "trace": null
+        },
+        "countryOfOrigin": {
+          "value": "INDIA",
+          "trace": {
+            "sourceImage": "dataset/raw/proprietary/product_008/back.jpg",
+            "sourceView": "back",
+            "sourceText": "7 J.L. Nehru Road, Kolkata-700071, INDIA.",
+            "sourceConfidence": 0.9396069049835205,
+            "sourceBoundingBox": [
+              [
+                551,
+                653
+              ],
+              [
+                784,
+                653
+              ],
+              [
+                784,
+                673
+              ],
+              [
+                551,
+                673
+              ]
+            ]
+          }
+        },
+        "manufacturerName": {
+          "value": null,
+          "trace": null
+        },
+        "consumerCareDetails": {
+          "value": null,
+          "trace": null
+        }
+      },
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "applicability": {
+        "rule6": "APPLICABLE",
+        "rule789": "APPLICABLE",
+        "rule11": "APPLICABLE"
+      },
+      "compliance": "REVIEW"
+    },
+    {
+      "productId": "product_009",
+      "frontImage": "dataset/raw/proprietary/product_009/front.jpeg",
+      "backImage": "dataset/raw/proprietary/product_009/back.jpeg",
+      "ocrSummary": {
+        "totalDetections": 38
+      },
+      "extractedFields": {
+        "mrp": {
+          "value": null,
+          "trace": null
+        },
+        "netQuantity": {
+          "value": null,
+          "trace": null
+        },
+        "batchLotNumber": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfManufacture": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfPacking": {
+          "value": null,
+          "trace": null
+        },
+        "expiryOrUseByDate": {
+          "value": null,
+          "trace": null
+        },
+        "countryOfOrigin": {
+          "value": null,
+          "trace": null
+        },
+        "manufacturerName": {
+          "value": "read the coding before price and refer below. (H) Plot No. 78, EPIP Phase I, Jharmajri, Baddi, Tehsil Nalagarh,",
+          "trace": {
+            "sourceImage": "dataset/raw/proprietary/product_009/back.jpeg",
+            "sourceView": "back",
+            "sourceText": "manufacturer read the coding before price and refer below. (H) Plot No. 78, EPIP Phase I, Jharmajri, Baddi, Tehsil Nalagarh,",
+            "sourceConfidence": 0.9880458116531372,
+            "sourceBoundingBox": [
+              [
+                357,
+                149
+              ],
+              [
+                1429,
+                149
+              ],
+              [
+                1429,
+                211
+              ],
+              [
+                357,
+                211
+              ]
+            ]
+          }
+        },
+        "consumerCareDetails": {
+          "value": null,
+          "trace": null
+        }
+      },
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "applicability": {
+        "rule6": "APPLICABLE",
+        "rule789": "APPLICABLE",
+        "rule11": "APPLICABLE"
+      },
+      "compliance": "REVIEW"
+    },
+    {
+      "productId": "product_010",
+      "frontImage": "dataset/raw/proprietary/product_010/front.jpeg",
+      "backImage": "dataset/raw/proprietary/product_010/back.jpeg",
+      "ocrSummary": {
+        "totalDetections": 57
+      },
+      "extractedFields": {
+        "mrp": {
+          "value": null,
+          "trace": null
+        },
+        "netQuantity": {
+          "value": null,
+          "trace": null
+        },
+        "batchLotNumber": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfManufacture": {
+          "value": null,
+          "trace": null
+        },
+        "dateOfPacking": {
+          "value": null,
+          "trace": null
+        },
+        "expiryOrUseByDate": {
+          "value": null,
+          "trace": null
+        },
+        "countryOfOrigin": {
+          "value": null,
+          "trace": null
+        },
+        "manufacturerName": {
+          "value": null,
+          "trace": null
+        },
+        "consumerCareDetails": {
+          "value": null,
+          "trace": null
+        }
+      },
+      "category": "unknown",
+      "categoryConfidence": 0,
+      "applicability": {
+        "rule6": "APPLICABLE",
+        "rule789": "APPLICABLE",
+        "rule11": "APPLICABLE"
+      },
+      "compliance": "REVIEW"
+    }
+  ]
+}

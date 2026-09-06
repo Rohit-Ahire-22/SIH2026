@@ -1,0 +1,15 @@
+# YOLOv8 Training Configuration for SIH26034 Continuous Learning
+
+model: 'yolov8n.pt' # Base pretrained model to use
+imgsz: 640          # Standard image size
+batch: 16           # Configure for RTX 3050 6GB or lower
+epochs: 100         # Maximum epochs, relies on early stopping
+patience: 20        # Early stopping patience
+optimizer: 'auto'   # AdamW or similar
+lr0: 0.01           # Initial learning rate
+device: '0'         # Uses GPU 0 by default, override via CLI/env if CPU
+workers: 4          # DataLoader workers
+seed: 42            # Deterministic training
+project: '../../../models/candidates'
+name: 'train_job'
+exist_ok: true

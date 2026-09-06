@@ -1,0 +1,93 @@
+{
+  "auditTimestamp": "2026-09-05T15:49:16.357Z",
+  "dataset": "Open Food Facts Indian Product Packaging Subset",
+  "products": {
+    "total": 40,
+    "withOneView": 40,
+    "withMultipleViews": 0,
+    "maxImagesPerProduct": 1
+  },
+  "images": {
+    "total": 40
+  },
+  "validity": {
+    "validImages": 40,
+    "invalidImages": 0,
+    "decodeFailures": 0,
+    "formatMismatches": 0
+  },
+  "duplicates": {
+    "totalImages": 40,
+    "uniqueSha256": 40,
+    "duplicateGroups": 0,
+    "duplicateFiles": 0,
+    "duplicatePercentage": "0.0%",
+    "perceptualDuplicateGroups": 0
+  },
+  "resolution": {
+    "minWidth": 114,
+    "maxWidth": 400,
+    "avgWidth": 283.2,
+    "minHeight": 176,
+    "maxHeight": 400,
+    "avgHeight": 367.5,
+    "minMP": 0.0456,
+    "maxMP": 0.16,
+    "avgMP": 0.10110860000000002,
+    "buckets": {
+      "< 0.3 MP": 40,
+      "0.3–0.75 MP": 0,
+      "0.75–1.5 MP": 0,
+      "1.5–3 MP": 0,
+      "> 3 MP": 0
+    }
+  },
+  "fileSize": {
+    "minBytes": 10277,
+    "maxBytes": 40816,
+    "avgBytes": 22140.5
+  },
+  "orientation": {
+    "portrait": 30,
+    "landscape": 9,
+    "square": 1
+  },
+  "imageTypes": {
+    "front": 40,
+    "back": 0,
+    "ingredients": 0,
+    "nutrition": 0,
+    "packaging": 0,
+    "unknown": 0
+  },
+  "multiViewCoverage": {
+    "front": 40,
+    "back": 0,
+    "ingredients": 0,
+    "nutrition": 0,
+    "packaging": 0,
+    "unknown": 0
+  },
+  "packagingRelevance": {
+    "likelyUseful": 40,
+    "uncertain": 0,
+    "poorQuality": 0
+  },
+  "frontPanelRelevance": {
+    "likelyUseful": 0,
+    "uncertain": 31,
+    "poorQuality": 9
+  },
+  "ocrReadabilityProxy": {
+    "good": 0,
+    "moderate": 0,
+    "poor": 40,
+    "unknown": 0
+  },
+  "barcodeQrPotential": "barcode/QR detection not executed because no suitable non-ML decoder was available",
+  "limitations": [
+    "Heuristics for OCR readability are purely image-quality proxies, not true OCR tests.",
+    "No legal compliance checks were performed.",
+    "Perceptual duplicates are based on dHash Hamming distances, not semantic understanding."
+  ]
+}

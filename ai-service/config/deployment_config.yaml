@@ -1,0 +1,21 @@
+# Engineering Defaults for Canary Deployment Safety Gates
+deployment:
+  stages:
+    - name: "SHADOW"
+      traffic_percentage: 0
+    - name: "CANARY_1"
+      traffic_percentage: 1
+    - name: "CANARY_5"
+      traffic_percentage: 5
+    - name: "CANARY_25"
+      traffic_percentage: 25
+    - name: "CANARY_50"
+      traffic_percentage: 50
+    - name: "PROMOTING"
+      traffic_percentage: 100
+  safety_gates:
+    min_samples: 100
+    max_error_rate: 0.05
+    max_latency_p95_ms: 1500
+    max_latency_regression_ms: 250
+    max_inference_failure_rate: 0.02

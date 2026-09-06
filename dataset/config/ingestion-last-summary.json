@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-09-06T00:27:11.107Z",
+  "productsScanned": 10,
+  "rawFilesScanned": 20,
+  "imported": 0,
+  "enriched": 20,
+  "exactDuplicates": 0,
+  "nearDuplicates": 0,
+  "review": 0,
+  "malformed": 0,
+  "uniqueProducts": 10,
+  "totalImagesInManifest": 20
+}

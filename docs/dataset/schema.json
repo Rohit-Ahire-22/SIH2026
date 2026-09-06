@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SIH26034 Dataset Source Manifest",
+  "description": "Metadata specification for tracking dataset sources and licensing",
+  "type": "object",
+  "properties": {
+    "datasetName": {
+      "type": "string",
+      "description": "Name of the dataset source"
+    },
+    "sourceUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL where the dataset can be retrieved or verified"
+    },
+    "license": {
+      "type": "string",
+      "description": "The exact license name (e.g. CC-BY 4.0, ODbL, Custom Commercial)"
+    },
+    "attributionRequired": {
+      "type": "boolean",
+      "description": "True if the license requires attribution"
+    },
+    "commercialUseAllowed": {
+      "type": "boolean",
+      "description": "True if the license allows commercial use without special permission"
+    },
+    "redistributionAllowed": {
+      "type": "boolean",
+      "description": "True if we are allowed to redistribute the dataset"
+    },
+    "imageCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of images in this dataset source"
+    },
+    "countryOrMarket": {
+      "type": "string",
+      "description": "Primary market or country of origin for the products (e.g. India, International)"
+    },
+    "annotationType": {
+      "type": "string",
+      "enum": ["bounding_box", "polygon", "classification", "unannotated", "mixed"],
+      "description": "The primary annotation format provided by this source"
+    },
+    "relevantClasses": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "product_package",
+          "principal_display_panel",
+          "grouped_declaration_panel",
+          "barcode",
+          "qr_code"
+        ]
+      },
+      "description": "The SIH26034 YOLO classes this dataset is useful for training"
+    },
+    "limitations": {
+      "type": "string",
+      "description": "Known limitations (e.g., 'Low resolution', 'Watermarked', 'Non-Indian packages')"
+    }
+  },
+  "required": [
+    "datasetName",
+    "license",
+    "commercialUseAllowed",
+    "imageCount",
+    "countryOrMarket",
+    "relevantClasses"
+  ]
+}

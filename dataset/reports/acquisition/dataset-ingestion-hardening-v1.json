@@ -1,0 +1,55 @@
+{
+  "status": "STEP 40: PRODUCTION DATASET INGESTION HARDENING",
+  "stepDisclaimer": "This step does not make the dataset training-ready.",
+  "generatedAt": "2026-09-06T00:27:29.082Z",
+  "dataset": {
+    "uniqueProducts": 10,
+    "totalImages": 20,
+    "views": {
+      "front": 10,
+      "back": 10,
+      "declaration": 0,
+      "unknown": 0
+    },
+    "categoryDistribution": {
+      "unknown": 20
+    },
+    "unknownCategoryCount": 20,
+    "productsWithDeclarationViews": 0,
+    "productsMissingDeclarationViews": 10,
+    "dimensions": {
+      "averageWidth": 1292.3,
+      "averageHeight": 1118.3,
+      "medianWidth": 1140,
+      "medianHeight": 1000.5
+    }
+  },
+  "deduplication": {
+    "exactDuplicates": 0,
+    "nearDuplicates": 0,
+    "nearDuplicatesInManifest": 0,
+    "reviewInManifest": 0,
+    "uniqueImages": 20,
+    "malformed": 0
+  },
+  "verificationQueue": {
+    "count": 20,
+    "priorityBreakdown": {
+      "1": 10,
+      "4": 10
+    }
+  },
+  "annotations": {
+    "humanVerified": 0,
+    "pending": 10
+  },
+  "readiness": {
+    "trainingReadiness": "NOT_READY",
+    "reason": "uniqueProducts=10 < 50; humanVerified=0 < 100"
+  },
+  "integrity": {
+    "splitLeakage": 0,
+    "licenseBlockers": 0
+  },
+  "metadataProvenanceNote": "Views (viewSource=filename_inference) and categories (categorySource=directory|filename) are INFERRED metadata, not verified labels."
+}

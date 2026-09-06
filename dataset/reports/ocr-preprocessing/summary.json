@@ -1,0 +1,496 @@
+{
+  "variants": [
+    {
+      "variant": "original",
+      "successImages": 2,
+      "failedImages": 0,
+      "totalDetections": 95,
+      "avgConfidence": 0.7306640690878818,
+      "avgLatencyMs": 41931,
+      "fieldCoverage": {
+        "mrp": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "netQuantity": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "batchLotNumber": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "dateOfManufacture": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "dateOfPacking": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "expiryOrUseByDate": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "countryOfOrigin": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "manufacturerName": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "consumerCareDetails": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        }
+      },
+      "compliance": {
+        "PASS": 2,
+        "FAIL": 0,
+        "REVIEW": 0,
+        "PENDING": 0
+      }
+    },
+    {
+      "variant": "grayscale",
+      "successImages": 2,
+      "failedImages": 0,
+      "totalDetections": 96,
+      "avgConfidence": 0.7252240047479669,
+      "avgLatencyMs": 75491,
+      "fieldCoverage": {
+        "mrp": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "netQuantity": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "batchLotNumber": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "dateOfManufacture": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "dateOfPacking": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "expiryOrUseByDate": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "countryOfOrigin": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "manufacturerName": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "consumerCareDetails": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        }
+      },
+      "compliance": {
+        "PASS": 2,
+        "FAIL": 0,
+        "REVIEW": 0,
+        "PENDING": 0
+      }
+    },
+    {
+      "variant": "upscale",
+      "successImages": 1,
+      "failedImages": 1,
+      "totalDetections": 11,
+      "avgConfidence": 0.806455295194279,
+      "avgLatencyMs": 364909,
+      "fieldCoverage": {
+        "mrp": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "netQuantity": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "batchLotNumber": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "dateOfManufacture": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "dateOfPacking": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "expiryOrUseByDate": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "countryOfOrigin": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "manufacturerName": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "consumerCareDetails": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        }
+      },
+      "compliance": {
+        "PASS": 1,
+        "FAIL": 0,
+        "REVIEW": 0,
+        "PENDING": 0
+      }
+    },
+    {
+      "variant": "contrast",
+      "successImages": 1,
+      "failedImages": 1,
+      "totalDetections": 13,
+      "avgConfidence": 0.8210848225997045,
+      "avgLatencyMs": 221737,
+      "fieldCoverage": {
+        "mrp": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "netQuantity": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "batchLotNumber": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "dateOfManufacture": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "dateOfPacking": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "expiryOrUseByDate": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "countryOfOrigin": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "manufacturerName": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "consumerCareDetails": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        }
+      },
+      "compliance": {
+        "PASS": 1,
+        "FAIL": 0,
+        "REVIEW": 0,
+        "PENDING": 0
+      }
+    },
+    {
+      "variant": "sharpen",
+      "successImages": 1,
+      "failedImages": 1,
+      "totalDetections": 13,
+      "avgConfidence": 0.7824363341698279,
+      "avgLatencyMs": 82650,
+      "fieldCoverage": {
+        "mrp": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "netQuantity": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "batchLotNumber": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "dateOfManufacture": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "dateOfPacking": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "expiryOrUseByDate": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "countryOfOrigin": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "manufacturerName": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "consumerCareDetails": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        }
+      },
+      "compliance": {
+        "PASS": 1,
+        "FAIL": 0,
+        "REVIEW": 0,
+        "PENDING": 0
+      }
+    },
+    {
+      "variant": "denoise",
+      "successImages": 1,
+      "failedImages": 1,
+      "totalDetections": 9,
+      "avgConfidence": 0.8377319110764397,
+      "avgLatencyMs": 87019,
+      "fieldCoverage": {
+        "mrp": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "netQuantity": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "batchLotNumber": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "dateOfManufacture": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "dateOfPacking": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "expiryOrUseByDate": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "countryOfOrigin": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "manufacturerName": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "consumerCareDetails": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        }
+      },
+      "compliance": {
+        "PASS": 1,
+        "FAIL": 0,
+        "REVIEW": 0,
+        "PENDING": 0
+      }
+    },
+    {
+      "variant": "adaptive_threshold",
+      "successImages": 1,
+      "failedImages": 1,
+      "totalDetections": 12,
+      "avgConfidence": 0.8564908082286516,
+      "avgLatencyMs": 81483,
+      "fieldCoverage": {
+        "mrp": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "netQuantity": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "batchLotNumber": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "dateOfManufacture": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "dateOfPacking": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "expiryOrUseByDate": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "countryOfOrigin": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "manufacturerName": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        },
+        "consumerCareDetails": {
+          "detected": 0,
+          "missing": 1,
+          "uncertain": 1
+        }
+      },
+      "compliance": {
+        "PASS": 1,
+        "FAIL": 0,
+        "REVIEW": 0,
+        "PENDING": 0
+      }
+    },
+    {
+      "variant": "combined",
+      "successImages": 2,
+      "failedImages": 0,
+      "totalDetections": 95,
+      "avgConfidence": 0.7183281079718941,
+      "avgLatencyMs": 94884,
+      "fieldCoverage": {
+        "mrp": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "netQuantity": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "batchLotNumber": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "dateOfManufacture": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "dateOfPacking": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "expiryOrUseByDate": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "countryOfOrigin": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "manufacturerName": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        },
+        "consumerCareDetails": {
+          "detected": 0,
+          "missing": 2,
+          "uncertain": 0
+        }
+      },
+      "compliance": {
+        "PASS": 2,
+        "FAIL": 0,
+        "REVIEW": 0,
+        "PENDING": 0
+      }
+    }
+  ],
+  "recommendation": {
+    "bestVariant": "original",
+    "reason": "Determined using a multi-factor score balancing extracted fields, confidence, and latency."
+  }
+}

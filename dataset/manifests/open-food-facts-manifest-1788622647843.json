@@ -1,0 +1,19 @@
+{
+  "datasetId": "open-food-facts-india",
+  "datasetName": "Open Food Facts Indian Product Packaging Subset",
+  "source": "Open Food Facts",
+  "sourceUrl": "https://world.openfoodfacts.org",
+  "imageLicense": "CC BY-SA 4.0",
+  "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "dataLicense": "ODbL 1.0",
+  "dataLicenseUrl": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "attribution": "Data from Open Food Facts contributors (CC BY-SA 4.0 / ODbL).",
+  "countryFilter": "india",
+  "requestedProductLimit": 20,
+  "downloadedProductCount": 20,
+  "downloadedImageCount": 20,
+  "failedDownloadCount": 0,
+  "duplicateCount": 20,
+  "downloadDate": "2026-09-05T15:36:52.354Z",
+  "limitations": "Images are for visual evidence only and represent CC BY-SA contributions, potentially including third-party brand graphics."
+}

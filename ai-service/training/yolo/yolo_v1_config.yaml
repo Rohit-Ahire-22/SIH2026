@@ -1,0 +1,14 @@
+# YOLO Dataset Configuration
+# This file is generated to point to the current normalized dataset structure
+# for SIH26034 project's package detector model.
+
+path: ../../../dataset/annotations/yolo
+train: images/train
+val: images/val
+test: images/test
+
+# Classes config
+names:
+  0: product_package
+  1: principal_display_panel
+  2: declaration_panel

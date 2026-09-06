@@ -1,0 +1,238 @@
+{
+  "datasetVersion": "yolo-annotation-v1",
+  "sourceDatasetVersion": "dataset-v1",
+  "schemaVersion": "1.0",
+  "classSchemaVersion": "1.0",
+  "createdAt": "2026-09-05T19:58:15.971Z",
+  "stats": {
+    "productCount": 10,
+    "imageCount": 20,
+    "frontCount": 10,
+    "backCount": 10,
+    "pendingCount": 20,
+    "annotatedCount": 0,
+    "validatedCount": 0
+  },
+  "images": [
+    {
+      "imageId": "b5ef883c-d43e-401c-9300-720b8c37279e",
+      "productId": "product_001",
+      "view": "back",
+      "sha256": "19d27854f5c5eddc5b7f595166f0926f59b406b215e816327aaf201d742241b4",
+      "filename": "product_001_back.jpeg",
+      "sourcePath": "dataset/raw/proprietary/product_001/back.jpeg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "66ec07b3-b849-4793-ae13-12ad83e9f694",
+      "productId": "product_001",
+      "view": "front",
+      "sha256": "00a02048bfbe2f9ce35e346eff3f5819b3141404ee0b8a9913c661c4d0777555",
+      "filename": "product_001_front.jpeg",
+      "sourcePath": "dataset/raw/proprietary/product_001/front.jpeg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "ea412381-f7e6-4825-a6a7-9c91a1b3beca",
+      "productId": "product_002",
+      "view": "back",
+      "sha256": "b754562b64b4a8af9b0a9b86cab19b7dcf2d2f577497aa60ac1a3d393b198211",
+      "filename": "product_002_back.jpeg",
+      "sourcePath": "dataset/raw/proprietary/product_002/back.jpeg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "69365d83-c940-4b41-9ff3-1582e959d01a",
+      "productId": "product_002",
+      "view": "front",
+      "sha256": "7d2a6494486cb8549b1c2284d2ad366b42d37e49e02f52a11eb297ee7cc4357f",
+      "filename": "product_002_front.jpeg",
+      "sourcePath": "dataset/raw/proprietary/product_002/front.jpeg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "02a4680a-c5d9-4baa-847d-3b122882b6cd",
+      "productId": "product_003",
+      "view": "back",
+      "sha256": "88f643ccb7a3d686cf3ef953aa317a65b90983a1ba522d0671e691dc83973c81",
+      "filename": "product_003_back.jpg",
+      "sourcePath": "dataset/raw/proprietary/product_003/back.jpg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "fcce1ac4-b37e-4d7d-a622-822afb35eda6",
+      "productId": "product_003",
+      "view": "front",
+      "sha256": "9a8dd28071eb5d09fd894b88b568d2c90e2f8b212cd8b5c082af92758a68999f",
+      "filename": "product_003_front.jpg",
+      "sourcePath": "dataset/raw/proprietary/product_003/front.jpg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "889571b6-aa83-4ff3-ae2c-9a254532a92d",
+      "productId": "product_004",
+      "view": "back",
+      "sha256": "34bfa7c3828ccf726b4f9f63cd3a3ff9ce51478a89f3d69d1fcbcfd2fa07d7a5",
+      "filename": "product_004_back.png",
+      "sourcePath": "dataset/raw/proprietary/product_004/back.png",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "0523e6c0-4982-4a13-8bd8-7aa15645b10a",
+      "productId": "product_004",
+      "view": "front",
+      "sha256": "510eb35e400072cdce06b1fa4983e43df8c676c9b3f1d99e1fed5ac04abe6342",
+      "filename": "product_004_front.jpg",
+      "sourcePath": "dataset/raw/proprietary/product_004/front.jpg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "a48c1b7e-418a-45e7-b103-53e95bc15eef",
+      "productId": "product_005",
+      "view": "back",
+      "sha256": "051de51a6ada210f5fe8173e21807d1a5b05e82a83620a838dd070b3ed296611",
+      "filename": "product_005_back.jpg",
+      "sourcePath": "dataset/raw/proprietary/product_005/back.jpg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "0a3edfda-9188-4e4b-8d6a-638b69aa3c59",
+      "productId": "product_005",
+      "view": "front",
+      "sha256": "35b37fcd05d5cc9c4701413c9a02486df38df047d92de2619a4d1002836cfd1b",
+      "filename": "product_005_front.jpeg",
+      "sourcePath": "dataset/raw/proprietary/product_005/front.jpeg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "0f95d50c-9075-43b5-b812-aeffc8ce58c9",
+      "productId": "product_006",
+      "view": "back",
+      "sha256": "eec03afb86f4e0a76fafd3920be62a9faecde6aff8f940975726feee30a12ed1",
+      "filename": "product_006_back.jpg",
+      "sourcePath": "dataset/raw/proprietary/product_006/back.jpg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "c9719d9c-6283-482c-bcca-67f33be880a4",
+      "productId": "product_006",
+      "view": "front",
+      "sha256": "95d912d6e61ca990a9a5814d24ff595c3c9ce5ede78519bc9b60b8ff3da90453",
+      "filename": "product_006_front.jpg",
+      "sourcePath": "dataset/raw/proprietary/product_006/front.jpg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "bc4ae4f3-3cb9-49ad-b6cb-7b944d027d7d",
+      "productId": "product_007",
+      "view": "back",
+      "sha256": "ea192e56b37c37ce63d345d11d76b472059ebb1c0e4ce0861066d5e6b79f4573",
+      "filename": "product_007_back.jpg",
+      "sourcePath": "dataset/raw/proprietary/product_007/back.jpg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "a1858efd-d9bd-4ed3-a764-33e702f01e65",
+      "productId": "product_007",
+      "view": "front",
+      "sha256": "452acc291d7e1a597cf1259329dae92a1adcbc47c4ea8fe5567d4d970a00157c",
+      "filename": "product_007_front.png",
+      "sourcePath": "dataset/raw/proprietary/product_007/front.png",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "16a0e156-77e5-47f1-a279-eb035599526c",
+      "productId": "product_008",
+      "view": "back",
+      "sha256": "d2e37a1c70494522676fcf71d8b3cf67ca9caeb389aecfa91a2a67ef04c5f4a3",
+      "filename": "product_008_back.jpg",
+      "sourcePath": "dataset/raw/proprietary/product_008/back.jpg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "a4dd56c7-1570-4d83-8516-f85562360d7d",
+      "productId": "product_008",
+      "view": "front",
+      "sha256": "5c82234f0a848fb30a626549ead3b494cc15c5e6b4c5d607fbe0bb0d02b0b70a",
+      "filename": "product_008_front.jpg",
+      "sourcePath": "dataset/raw/proprietary/product_008/front.jpg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "0d58ffc3-a86a-4d19-80ab-d8278ed0cc18",
+      "productId": "product_009",
+      "view": "back",
+      "sha256": "55edfd107c7819864f06c3e3be93ccfb2d4189d6847a97f8d3a9feb961ee926b",
+      "filename": "product_009_back.jpeg",
+      "sourcePath": "dataset/raw/proprietary/product_009/back.jpeg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "dd98aaad-174a-47a7-bde1-55b3994b946c",
+      "productId": "product_009",
+      "view": "front",
+      "sha256": "58e81674d864eec2a06f273c3cb55c6ba346e648a39e5fc1b57fa62db035f14f",
+      "filename": "product_009_front.jpeg",
+      "sourcePath": "dataset/raw/proprietary/product_009/front.jpeg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "1e85ff6f-bd30-4ba9-98ba-9e15adde4915",
+      "productId": "product_010",
+      "view": "back",
+      "sha256": "b910e86459da6dd64ddb4e5e65860765b8166df5feed42342e348bbed1ea30d3",
+      "filename": "product_010_back.jpeg",
+      "sourcePath": "dataset/raw/proprietary/product_010/back.jpeg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    },
+    {
+      "imageId": "a26689ed-1a33-4159-b7c6-96ffb2d31109",
+      "productId": "product_010",
+      "view": "front",
+      "sha256": "f545d152485369777c669cc2743620490c453968b3c829d426def78e6187e0bf",
+      "filename": "product_010_front.jpeg",
+      "sourcePath": "dataset/raw/proprietary/product_010/front.jpeg",
+      "status": "pending",
+      "annotationVersion": null,
+      "trainingEligible": false
+    }
+  ]
+}

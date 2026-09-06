@@ -1,0 +1,42 @@
+{
+  "status": "STEP 37 COMPLETE",
+  "dataset": {
+    "uniqueProducts": 10,
+    "totalImages": 20,
+    "frontImages": 10,
+    "backImages": 10
+  },
+  "annotations": {
+    "weakCandidates": 10,
+    "pendingAnnotations": 10,
+    "acceptedAnnotations": 0,
+    "correctedAnnotations": 0,
+    "rejectedAnnotations": 0,
+    "humanVerifiedAnnotations": 0,
+    "trainingEligibleAnnotations": 0
+  },
+  "classDistribution": {
+    "product_package": 0,
+    "principal_display_panel": 0,
+    "declaration_panel": 10
+  },
+  "licenses": {
+    "approvedLicensedAnnotations": 10,
+    "licenseBlockedAnnotations": 0
+  },
+  "validations": {
+    "splitLeakage": false,
+    "validationErrors": 0
+  },
+  "readiness": {
+    "trainingReadiness": "NOT_READY",
+    "milestone": "PRE_MILESTONE"
+  },
+  "flags": {
+    "yoloTrained": false,
+    "rawDataModified": false,
+    "legalEngineModified": false
+  },
+  "tests": "PASSED",
+  "step38Recommendation": "GO TO STEP 38 (Human Annotation Campaign)"
+}

@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-09-05T22:06:19.149Z",
+  "status": "NOT_READY",
+  "metrics": {
+    "uniqueProducts": 10,
+    "totalImages": 20,
+    "humanVerifiedAnnotations": 0,
+    "weakCandidates": 10
+  },
+  "blockers": [
+    "Insufficient verified annotations (0/100 required for experiment).",
+    "Insufficient product diversity (10/50 required for experiment)."
+  ]
+}

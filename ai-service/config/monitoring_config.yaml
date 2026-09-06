@@ -1,0 +1,14 @@
+monitoring:
+  windows:
+    short_window_ms: 300000     # 5 minutes
+    medium_window_ms: 3600000   # 1 hour
+    long_window_ms: 86400000    # 24 hours
+  drift:
+    min_samples_for_drift: 1000
+    thresholds:
+      max_no_detection_rate: 0.15
+      max_latency_p95_ms: 1200
+  retraining:
+    cooldown_ms: 86400000       # Prevent retraining loops within 24 hours
+    max_attempts_per_window: 1
+    dataset_growth_trigger: 500 # Auto-trigger if dataset grows by 500 verified samples

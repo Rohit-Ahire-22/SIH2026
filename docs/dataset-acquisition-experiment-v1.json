@@ -1,0 +1,29 @@
+{
+  "productsInspected": 49,
+  "offImagesDownloaded": 48,
+  "gsdImagesDownloaded": 9,
+  "imageTypes": {
+    "front": 48,
+    "back": 0,
+    "ingredients": 0,
+    "nutrition": 0,
+    "packaging": 0,
+    "other": 0,
+    "shelf": 9
+  },
+  "duplicates": 0,
+  "highRes": 0,
+  "resolutions": {
+    "<0.3 MP": 57,
+    "0.3-1 MP": 0,
+    "1-2 MP": 0,
+    "2-5 MP": 0,
+    ">5 MP": 0
+  },
+  "multiView": {
+    "1": 48,
+    "2": 0,
+    "3": 0,
+    "4+": 0
+  }
+}

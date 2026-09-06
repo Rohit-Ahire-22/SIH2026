@@ -1,0 +1,112 @@
+[
+  {
+    "imageId": "b5ef883c-d43e-401c-9300-720b8c37279e",
+    "productId": "product_001",
+    "view": "back",
+    "variant": "original",
+    "status": "success",
+    "runtimeMs": 64030,
+    "detectionCount": 83,
+    "averageConfidence": 0.7165454827159284
+  },
+  {
+    "imageId": "b5ef883c-d43e-401c-9300-720b8c37279e",
+    "productId": "product_001",
+    "view": "back",
+    "variant": "grayscale",
+    "status": "success",
+    "runtimeMs": 130743,
+    "detectionCount": 83,
+    "averageConfidence": 0.7101597351482115
+  },
+  {
+    "imageId": "b5ef883c-d43e-401c-9300-720b8c37279e",
+    "productId": "product_001",
+    "view": "back",
+    "variant": "combined",
+    "status": "success",
+    "runtimeMs": 115673,
+    "detectionCount": 80,
+    "averageConfidence": 0.7124167729169131
+  },
+  {
+    "imageId": "66ec07b3-b849-4793-ae13-12ad83e9f694",
+    "productId": "product_001",
+    "view": "front",
+    "variant": "original",
+    "status": "success",
+    "runtimeMs": 19832,
+    "detectionCount": 12,
+    "averageConfidence": 0.828317624827226
+  },
+  {
+    "imageId": "66ec07b3-b849-4793-ae13-12ad83e9f694",
+    "productId": "product_001",
+    "view": "front",
+    "variant": "grayscale",
+    "status": "success",
+    "runtimeMs": 20239,
+    "detectionCount": 13,
+    "averageConfidence": 0.8214035721925589
+  },
+  {
+    "imageId": "66ec07b3-b849-4793-ae13-12ad83e9f694",
+    "productId": "product_001",
+    "view": "front",
+    "variant": "upscale",
+    "status": "success",
+    "runtimeMs": 64903,
+    "detectionCount": 11,
+    "averageConfidence": 0.806455295194279
+  },
+  {
+    "imageId": "66ec07b3-b849-4793-ae13-12ad83e9f694",
+    "productId": "product_001",
+    "view": "front",
+    "variant": "contrast",
+    "status": "success",
+    "runtimeMs": 19803,
+    "detectionCount": 13,
+    "averageConfidence": 0.8210848225997045
+  },
+  {
+    "imageId": "66ec07b3-b849-4793-ae13-12ad83e9f694",
+    "productId": "product_001",
+    "view": "front",
+    "variant": "sharpen",
+    "status": "success",
+    "runtimeMs": 20101,
+    "detectionCount": 13,
+    "averageConfidence": 0.7824363341698279
+  },
+  {
+    "imageId": "66ec07b3-b849-4793-ae13-12ad83e9f694",
+    "productId": "product_001",
+    "view": "front",
+    "variant": "denoise",
+    "status": "success",
+    "runtimeMs": 20193,
+    "detectionCount": 9,
+    "averageConfidence": 0.8377319110764397
+  },
+  {
+    "imageId": "66ec07b3-b849-4793-ae13-12ad83e9f694",
+    "productId": "product_001",
+    "view": "front",
+    "variant": "adaptive_threshold",
+    "status": "success",
+    "runtimeMs": 20053,
+    "detectionCount": 12,
+    "averageConfidence": 0.8564908082286516
+  },
+  {
+    "imageId": "66ec07b3-b849-4793-ae13-12ad83e9f694",
+    "productId": "product_001",
+    "view": "front",
+    "variant": "combined",
+    "status": "success",
+    "runtimeMs": 74095,
+    "detectionCount": 15,
+    "averageConfidence": 0.7498552282651265
+  }
+]

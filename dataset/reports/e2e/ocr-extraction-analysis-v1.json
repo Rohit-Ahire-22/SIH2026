@@ -1,0 +1,37 @@
+{
+  "status": "STEP 34 COMPLETE",
+  "baseline": {
+    "mrp": 0,
+    "netQuantity": 0.10,
+    "batchLotNumber": 0.10,
+    "dates": 0,
+    "manufacturer": 0.10,
+    "countryOfOrigin": 0.05,
+    "consumerCare": 0
+  },
+  "after": {
+    "mrp": 0.10,
+    "netQuantity": 0.15,
+    "batchLotNumber": 0.15,
+    "dates": 0,
+    "manufacturer": 0.25,
+    "countryOfOrigin": 0.20,
+    "consumerCare": 0.05
+  },
+  "errorTaxonomy": {
+    "spatialAssociationFailure": "Common - Labels separated from values vertically",
+    "fragmentationFailure": "Common - Words on same line split into distinct bounding boxes",
+    "normalizationFailure": "Moderate - Punctuation variances handled via regex tuning"
+  },
+  "architecturalChanges": [
+    "Implemented reconstructLines() for Y-clustering bounding boxes into cohesive physical lines.",
+    "Introduced multi-line vertical lookahead across all field regex extractors."
+  ],
+  "roiAnalysis": {
+    "roiCandidates": 7,
+    "roiAttempts": 7,
+    "roiSuccesses": 7,
+    "effectiveness": "Limited by heuristic generation; requires YOLO for precise legal region bounding."
+  },
+  "recommendation": "GO TO STEP 35"
+}

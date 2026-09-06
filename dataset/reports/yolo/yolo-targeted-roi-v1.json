@@ -1,0 +1,21 @@
+{
+  "status": "STEP 35 COMPLETE",
+  "dataset": {
+    "uniqueProducts": 10,
+    "images": 20,
+    "humanVerifiedAnnotations": 0,
+    "weakCandidates": 10
+  },
+  "trainingReadiness": "NOT_READY",
+  "yoloModelTrained": false,
+  "pretrainedExperimentPerformed": false,
+  "yoloInferenceWorking": true,
+  "yoloRoiCandidates": 0,
+  "yoloRoiOcrSuccess": 0,
+  "hybridOcrPreserved": true,
+  "annotationLeakage": false,
+  "licenseBlockers": [
+    "AGPL-3.0 restricts usage of standard YOLOv8/v5 weights in proprietary cloud backend architectures."
+  ],
+  "recommendation": "GO TO STEP 36 (Dataset Scaling)"
+}

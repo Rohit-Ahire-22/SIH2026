@@ -1,0 +1,21 @@
+{
+  "environment": {
+    "os": "Windows",
+    "paddle_device": "cpu",
+    "mkldnn_enabled": false
+  },
+  "metrics": {
+    "model_init_time_sec": 4.32,
+    "cold_inference_time_sec": 65.43,
+    "warm_inference_time_sec": 65.39
+  },
+  "fastapi": {
+    "health_check_responsive": true,
+    "ocr_blocked_event_loop": false
+  },
+  "resolution": {
+    "async_removed_from_route": true,
+    "inference_lock_added": true,
+    "node_timeout_increased": true
+  }
+}

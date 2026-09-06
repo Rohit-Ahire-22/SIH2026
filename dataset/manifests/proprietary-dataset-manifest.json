@@ -1,0 +1,609 @@
+{
+  "schemaVersion": "1.0",
+  "datasetVersion": "dataset-v1",
+  "generatedAt": "2026-09-05T18:03:56.624Z",
+  "sourceRoot": "dataset/raw/proprietary",
+  "sourceType": "user_captured",
+  "ownership": "project_owned",
+  "productCount": 10,
+  "imageCount": 20,
+  "validationSummary": {
+    "exactDuplicates": 0,
+    "invalidProducts": 0,
+    "warnings": false
+  },
+  "products": [
+    {
+      "productId": "product_001",
+      "imageCount": 2,
+      "views": [
+        "back",
+        "front"
+      ],
+      "frontImage": "66ec07b3-b849-4793-ae13-12ad83e9f694",
+      "backImage": "b5ef883c-d43e-401c-9300-720b8c37279e",
+      "status": "complete"
+    },
+    {
+      "productId": "product_002",
+      "imageCount": 2,
+      "views": [
+        "back",
+        "front"
+      ],
+      "frontImage": "69365d83-c940-4b41-9ff3-1582e959d01a",
+      "backImage": "ea412381-f7e6-4825-a6a7-9c91a1b3beca",
+      "status": "complete"
+    },
+    {
+      "productId": "product_003",
+      "imageCount": 2,
+      "views": [
+        "back",
+        "front"
+      ],
+      "frontImage": "fcce1ac4-b37e-4d7d-a622-822afb35eda6",
+      "backImage": "02a4680a-c5d9-4baa-847d-3b122882b6cd",
+      "status": "complete"
+    },
+    {
+      "productId": "product_004",
+      "imageCount": 2,
+      "views": [
+        "back",
+        "front"
+      ],
+      "frontImage": "0523e6c0-4982-4a13-8bd8-7aa15645b10a",
+      "backImage": "889571b6-aa83-4ff3-ae2c-9a254532a92d",
+      "status": "complete"
+    },
+    {
+      "productId": "product_005",
+      "imageCount": 2,
+      "views": [
+        "back",
+        "front"
+      ],
+      "frontImage": "0a3edfda-9188-4e4b-8d6a-638b69aa3c59",
+      "backImage": "a48c1b7e-418a-45e7-b103-53e95bc15eef",
+      "status": "complete"
+    },
+    {
+      "productId": "product_006",
+      "imageCount": 2,
+      "views": [
+        "back",
+        "front"
+      ],
+      "frontImage": "c9719d9c-6283-482c-bcca-67f33be880a4",
+      "backImage": "0f95d50c-9075-43b5-b812-aeffc8ce58c9",
+      "status": "complete"
+    },
+    {
+      "productId": "product_007",
+      "imageCount": 2,
+      "views": [
+        "back",
+        "front"
+      ],
+      "frontImage": "a1858efd-d9bd-4ed3-a764-33e702f01e65",
+      "backImage": "bc4ae4f3-3cb9-49ad-b6cb-7b944d027d7d",
+      "status": "complete"
+    },
+    {
+      "productId": "product_008",
+      "imageCount": 2,
+      "views": [
+        "back",
+        "front"
+      ],
+      "frontImage": "a4dd56c7-1570-4d83-8516-f85562360d7d",
+      "backImage": "16a0e156-77e5-47f1-a279-eb035599526c",
+      "status": "complete"
+    },
+    {
+      "productId": "product_009",
+      "imageCount": 2,
+      "views": [
+        "back",
+        "front"
+      ],
+      "frontImage": "dd98aaad-174a-47a7-bde1-55b3994b946c",
+      "backImage": "0d58ffc3-a86a-4d19-80ab-d8278ed0cc18",
+      "status": "complete"
+    },
+    {
+      "productId": "product_010",
+      "imageCount": 2,
+      "views": [
+        "back",
+        "front"
+      ],
+      "frontImage": "a26689ed-1a33-4159-b7c6-96ffb2d31109",
+      "backImage": "1e85ff6f-bd30-4ba9-98ba-9e15adde4915",
+      "status": "complete"
+    }
+  ],
+  "images": [
+    {
+      "imageId": "b5ef883c-d43e-401c-9300-720b8c37279e",
+      "productId": "product_001",
+      "view": "back",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpeg",
+      "fileSizeBytes": 140845,
+      "sha256": "19d27854f5c5eddc5b7f595166f0926f59b406b215e816327aaf201d742241b4",
+      "quality": {
+        "width": 1200,
+        "height": 1600,
+        "megapixels": 1.92,
+        "aspectRatio": 0.75,
+        "averageBrightness": 138.98533941143288,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:54.437Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_001/back.jpeg"
+    },
+    {
+      "imageId": "66ec07b3-b849-4793-ae13-12ad83e9f694",
+      "productId": "product_001",
+      "view": "front",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpeg",
+      "fileSizeBytes": 113421,
+      "sha256": "00a02048bfbe2f9ce35e346eff3f5819b3141404ee0b8a9913c661c4d0777555",
+      "quality": {
+        "width": 1200,
+        "height": 1600,
+        "megapixels": 1.92,
+        "aspectRatio": 0.75,
+        "averageBrightness": 140.0644689286445,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:54.592Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_001/front.jpeg"
+    },
+    {
+      "imageId": "ea412381-f7e6-4825-a6a7-9c91a1b3beca",
+      "productId": "product_002",
+      "view": "back",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpeg",
+      "fileSizeBytes": 162459,
+      "sha256": "b754562b64b4a8af9b0a9b86cab19b7dcf2d2f577497aa60ac1a3d393b198211",
+      "quality": {
+        "width": 1580,
+        "height": 867,
+        "megapixels": 1.36986,
+        "aspectRatio": 1.8223760092272203,
+        "averageBrightness": 148.28035697920976,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:54.690Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_002/back.jpeg"
+    },
+    {
+      "imageId": "69365d83-c940-4b41-9ff3-1582e959d01a",
+      "productId": "product_002",
+      "view": "front",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpeg",
+      "fileSizeBytes": 134768,
+      "sha256": "7d2a6494486cb8549b1c2284d2ad366b42d37e49e02f52a11eb297ee7cc4357f",
+      "quality": {
+        "width": 982,
+        "height": 1600,
+        "megapixels": 1.5712,
+        "aspectRatio": 0.61375,
+        "averageBrightness": 84.12653367086291,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:54.797Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_002/front.jpeg"
+    },
+    {
+      "imageId": "02a4680a-c5d9-4baa-847d-3b122882b6cd",
+      "productId": "product_003",
+      "view": "back",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpg",
+      "fileSizeBytes": 259846,
+      "sha256": "88f643ccb7a3d686cf3ef953aa317a65b90983a1ba522d0671e691dc83973c81",
+      "quality": {
+        "width": 1500,
+        "height": 848,
+        "megapixels": 1.272,
+        "aspectRatio": 1.7688679245283019,
+        "averageBrightness": 152.6815860781766,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:54.943Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_003/back.jpg"
+    },
+    {
+      "imageId": "fcce1ac4-b37e-4d7d-a622-822afb35eda6",
+      "productId": "product_003",
+      "view": "front",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpg",
+      "fileSizeBytes": 602759,
+      "sha256": "9a8dd28071eb5d09fd894b88b568d2c90e2f8b212cd8b5c082af92758a68999f",
+      "quality": {
+        "width": 2538,
+        "height": 1292,
+        "megapixels": 3.279096,
+        "aspectRatio": 1.9643962848297214,
+        "averageBrightness": 110.1570254417794,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:55.169Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_003/front.jpg"
+    },
+    {
+      "imageId": "889571b6-aa83-4ff3-ae2c-9a254532a92d",
+      "productId": "product_004",
+      "view": "back",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".png",
+      "fileSizeBytes": 612214,
+      "sha256": "34bfa7c3828ccf726b4f9f63cd3a3ff9ce51478a89f3d69d1fcbcfd2fa07d7a5",
+      "quality": {
+        "width": 520,
+        "height": 712,
+        "megapixels": 0.37024,
+        "aspectRatio": 0.7303370786516854,
+        "averageBrightness": 158.44023113118052,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:55.202Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_004/back.png"
+    },
+    {
+      "imageId": "0523e6c0-4982-4a13-8bd8-7aa15645b10a",
+      "productId": "product_004",
+      "view": "front",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpg",
+      "fileSizeBytes": 263194,
+      "sha256": "510eb35e400072cdce06b1fa4983e43df8c676c9b3f1d99e1fed5ac04abe6342",
+      "quality": {
+        "width": 1080,
+        "height": 1080,
+        "megapixels": 1.1664,
+        "aspectRatio": 1,
+        "averageBrightness": 194.48832802552062,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:55.339Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_004/front.jpg"
+    },
+    {
+      "imageId": "a48c1b7e-418a-45e7-b103-53e95bc15eef",
+      "productId": "product_005",
+      "view": "back",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpg",
+      "fileSizeBytes": 83591,
+      "sha256": "051de51a6ada210f5fe8173e21807d1a5b05e82a83620a838dd070b3ed296611",
+      "quality": {
+        "width": 1068,
+        "height": 671,
+        "megapixels": 0.716628,
+        "aspectRatio": 1.5916542473919524,
+        "averageBrightness": 233.94520013033286,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:55.398Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_005/back.jpg"
+    },
+    {
+      "imageId": "0a3edfda-9188-4e4b-8d6a-638b69aa3c59",
+      "productId": "product_005",
+      "view": "front",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpeg",
+      "fileSizeBytes": 40240,
+      "sha256": "35b37fcd05d5cc9c4701413c9a02486df38df047d92de2619a4d1002836cfd1b",
+      "quality": {
+        "width": 800,
+        "height": 800,
+        "megapixels": 0.64,
+        "aspectRatio": 1,
+        "averageBrightness": 218.7146920110468,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:55.445Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_005/front.jpeg"
+    },
+    {
+      "imageId": "0f95d50c-9075-43b5-b812-aeffc8ce58c9",
+      "productId": "product_006",
+      "view": "back",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpg",
+      "fileSizeBytes": 132697,
+      "sha256": "eec03afb86f4e0a76fafd3920be62a9faecde6aff8f940975726feee30a12ed1",
+      "quality": {
+        "width": 866,
+        "height": 1390,
+        "megapixels": 1.20374,
+        "aspectRatio": 0.6230215827338129,
+        "averageBrightness": 153.5199664588131,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:55.524Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_006/back.jpg"
+    },
+    {
+      "imageId": "c9719d9c-6283-482c-bcca-67f33be880a4",
+      "productId": "product_006",
+      "view": "front",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpg",
+      "fileSizeBytes": 67728,
+      "sha256": "95d912d6e61ca990a9a5814d24ff595c3c9ce5ede78519bc9b60b8ff3da90453",
+      "quality": {
+        "width": 1499,
+        "height": 1500,
+        "megapixels": 2.2485,
+        "aspectRatio": 0.9993333333333333,
+        "averageBrightness": 183.69700981948498,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:55.670Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_006/front.jpg"
+    },
+    {
+      "imageId": "bc4ae4f3-3cb9-49ad-b6cb-7b944d027d7d",
+      "productId": "product_007",
+      "view": "back",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpg",
+      "fileSizeBytes": 174289,
+      "sha256": "ea192e56b37c37ce63d345d11d76b472059ebb1c0e4ce0861066d5e6b79f4573",
+      "quality": {
+        "width": 1068,
+        "height": 671,
+        "megapixels": 0.716628,
+        "aspectRatio": 1.5916542473919524,
+        "averageBrightness": 219.13382452406628,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:55.736Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_007/back.jpg"
+    },
+    {
+      "imageId": "a1858efd-d9bd-4ed3-a764-33e702f01e65",
+      "productId": "product_007",
+      "view": "front",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".png",
+      "fileSizeBytes": 312922,
+      "sha256": "452acc291d7e1a597cf1259329dae92a1adcbc47c4ea8fe5567d4d970a00157c",
+      "quality": {
+        "width": 611,
+        "height": 808,
+        "megapixels": 0.493688,
+        "aspectRatio": 0.7561881188118812,
+        "averageBrightness": 206.1902844508805,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:55.767Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_007/front.png"
+    },
+    {
+      "imageId": "16a0e156-77e5-47f1-a279-eb035599526c",
+      "productId": "product_008",
+      "view": "back",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpg",
+      "fileSizeBytes": 426849,
+      "sha256": "d2e37a1c70494522676fcf71d8b3cf67ca9caeb389aecfa91a2a67ef04c5f4a3",
+      "quality": {
+        "width": 1080,
+        "height": 1080,
+        "megapixels": 1.1664,
+        "aspectRatio": 1,
+        "averageBrightness": 210.50549753604344,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:55.858Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_008/back.jpg"
+    },
+    {
+      "imageId": "a4dd56c7-1570-4d83-8516-f85562360d7d",
+      "productId": "product_008",
+      "view": "front",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpg",
+      "fileSizeBytes": 756493,
+      "sha256": "5c82234f0a848fb30a626549ead3b494cc15c5e6b4c5d607fbe0bb0d02b0b70a",
+      "quality": {
+        "width": 2560,
+        "height": 2560,
+        "megapixels": 6.5536,
+        "aspectRatio": 1,
+        "averageBrightness": 192.4803735062318,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:56.331Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_008/front.jpg"
+    },
+    {
+      "imageId": "0d58ffc3-a86a-4d19-80ab-d8278ed0cc18",
+      "productId": "product_009",
+      "view": "back",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpeg",
+      "fileSizeBytes": 90430,
+      "sha256": "55edfd107c7819864f06c3e3be93ccfb2d4189d6847a97f8d3a9feb961ee926b",
+      "quality": {
+        "width": 1599,
+        "height": 397,
+        "megapixels": 0.634803,
+        "aspectRatio": 4.027707808564232,
+        "averageBrightness": 108.69801827494399,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:56.377Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_009/back.jpeg"
+    },
+    {
+      "imageId": "dd98aaad-174a-47a7-bde1-55b3994b946c",
+      "productId": "product_009",
+      "view": "front",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpeg",
+      "fileSizeBytes": 49786,
+      "sha256": "58e81674d864eec2a06f273c3cb55c6ba346e648a39e5fc1b57fa62db035f14f",
+      "quality": {
+        "width": 1599,
+        "height": 368,
+        "megapixels": 0.588432,
+        "aspectRatio": 4.345108695652174,
+        "averageBrightness": 95.28710644219507,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:56.414Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_009/front.jpeg"
+    },
+    {
+      "imageId": "1e85ff6f-bd30-4ba9-98ba-9e15adde4915",
+      "productId": "product_010",
+      "view": "back",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpeg",
+      "fileSizeBytes": 116231,
+      "sha256": "b910e86459da6dd64ddb4e5e65860765b8166df5feed42342e348bbed1ea30d3",
+      "quality": {
+        "width": 974,
+        "height": 1600,
+        "megapixels": 1.5584,
+        "aspectRatio": 0.60875,
+        "averageBrightness": 110.68596921704739,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:56.520Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_010/back.jpeg"
+    },
+    {
+      "imageId": "a26689ed-1a33-4159-b7c6-96ffb2d31109",
+      "productId": "product_010",
+      "view": "front",
+      "sourceType": "user_captured",
+      "ownership": "project_owned",
+      "extension": ".jpeg",
+      "fileSizeBytes": 60208,
+      "sha256": "f545d152485369777c669cc2743620490c453968b3c829d426def78e6187e0bf",
+      "quality": {
+        "width": 1522,
+        "height": 921,
+        "megapixels": 1.401762,
+        "aspectRatio": 1.6525515743756787,
+        "averageBrightness": 95.76595964273189,
+        "sharpness": "unknown",
+        "contrast": "unknown"
+      },
+      "captureTimestamp": "2026-09-05T18:03:56.624Z",
+      "annotationStatus": "pending",
+      "trainingEligible": false,
+      "trainingStatus": "candidate",
+      "relativePath": "dataset/raw/proprietary/product_010/front.jpeg"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "version": "1.0",
+  "strategies": [
+    {
+      "id": "strategy_a",
+      "name": "Manual Annotation Only",
+      "minimum_human_products": 100,
+      "minimum_human_images": 200,
+      "minimum_human_boxes": 200
+    },
+    {
+      "id": "strategy_b",
+      "name": "Weak Supervision + Manual Verification",
+      "minimum_human_products": 100,
+      "minimum_human_images": 200,
+      "minimum_human_boxes": 200
+    },
+    {
+      "id": "strategy_c",
+      "name": "External Datasets + Weak Supervision + Verification",
+      "minimum_human_products": 50,
+      "minimum_human_images": 100,
+      "minimum_human_boxes": 100
+    },
+    {
+      "id": "strategy_d",
+      "name": "Hybrid OCR/Geometry (No YOLO)",
+      "minimum_human_products": 0,
+      "minimum_human_images": 0,
+      "minimum_human_boxes": 0
+    }
+  ],
+  "dataSources": [
+    {
+      "source": "proprietary",
+      "role": "TRAINING, VALIDATION, TEST",
+      "provenance": "proprietary_human_verified",
+      "test_eligible": true
+    },
+    {
+      "source": "weak_candidates",
+      "role": "CANDIDATE",
+      "provenance": "weak_candidate",
+      "test_eligible": false
+    },
+    {
+      "source": "open_food_facts",
+      "role": "TRAINING",
+      "provenance": "external_human_annotation",
+      "test_eligible": false
+    },
+    {
+      "source": "synthetic_augmentations",
+      "role": "TRAINING",
+      "provenance": "synthetic",
+      "test_eligible": false
+    }
+  ]
+}

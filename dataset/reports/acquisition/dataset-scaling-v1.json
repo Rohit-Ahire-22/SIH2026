@@ -1,0 +1,40 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-09-05T22:12:00Z",
+  "scalingStatus": {
+    "uniqueProducts": 10,
+    "totalImages": 20,
+    "frontImages": 10,
+    "backImages": 10,
+    "humanVerifiedAnnotations": 0,
+    "weakCandidates": 10
+  },
+  "trainingReadiness": "NOT_READY",
+  "currentMilestone": "PRE_MILESTONE",
+  "sources": {
+    "approved": 1,
+    "conditional": 1,
+    "rejected": 3
+  },
+  "categoryDistribution": {
+    "food": 10,
+    "beverage": 0,
+    "cosmetic": 0,
+    "pharmaceutical": 0
+  },
+  "viewDistribution": {
+    "front": 10,
+    "back": 10
+  },
+  "licenseDistribution": {
+    "proprietary": 20
+  },
+  "pipelineStats": {
+    "duplicatesRejected": 0,
+    "qualityRejected": 0
+  },
+  "nextAcquisitionActions": [
+    "Identify additional internal proprietary product images.",
+    "Engage Open Food Facts for visual pretraining ONLY, isolating from ground truth."
+  ]
+}

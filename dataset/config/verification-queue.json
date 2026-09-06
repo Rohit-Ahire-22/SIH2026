@@ -1,0 +1,299 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-09-06T00:27:22.318Z",
+  "deterministicOrder": "priority | productId | imageId | filePath",
+  "priorityModel": [
+    {
+      "priority": 1,
+      "label": "declaration_panel candidate"
+    },
+    {
+      "priority": 2,
+      "label": "back-panel view"
+    },
+    {
+      "priority": 3,
+      "label": "underrepresented category"
+    },
+    {
+      "priority": 4,
+      "label": "product lacks verified annotation"
+    },
+    {
+      "priority": 5,
+      "label": "remaining unannotated candidate"
+    }
+  ],
+  "items": [
+    {
+      "imageId": "product_001_back",
+      "productId": "product_001",
+      "filePath": "product_001/back.jpeg",
+      "view": "back",
+      "category": "unknown",
+      "priority": 1,
+      "priorityReasons": [
+        "declaration_panel candidate"
+      ],
+      "annotationStatus": "PENDING",
+      "provenance": "weak_candidate"
+    },
+    {
+      "imageId": "product_002_back",
+      "productId": "product_002",
+      "filePath": "product_002/back.jpeg",
+      "view": "back",
+      "category": "unknown",
+      "priority": 1,
+      "priorityReasons": [
+        "declaration_panel candidate"
+      ],
+      "annotationStatus": "PENDING",
+      "provenance": "weak_candidate"
+    },
+    {
+      "imageId": "product_003_back",
+      "productId": "product_003",
+      "filePath": "product_003/back.jpg",
+      "view": "back",
+      "category": "unknown",
+      "priority": 1,
+      "priorityReasons": [
+        "declaration_panel candidate"
+      ],
+      "annotationStatus": "PENDING",
+      "provenance": "weak_candidate"
+    },
+    {
+      "imageId": "product_004_back",
+      "productId": "product_004",
+      "filePath": "product_004/back.png",
+      "view": "back",
+      "category": "unknown",
+      "priority": 1,
+      "priorityReasons": [
+        "declaration_panel candidate"
+      ],
+      "annotationStatus": "PENDING",
+      "provenance": "weak_candidate"
+    },
+    {
+      "imageId": "product_005_back",
+      "productId": "product_005",
+      "filePath": "product_005/back.jpg",
+      "view": "back",
+      "category": "unknown",
+      "priority": 1,
+      "priorityReasons": [
+        "declaration_panel candidate"
+      ],
+      "annotationStatus": "PENDING",
+      "provenance": "weak_candidate"
+    },
+    {
+      "imageId": "product_006_back",
+      "productId": "product_006",
+      "filePath": "product_006/back.jpg",
+      "view": "back",
+      "category": "unknown",
+      "priority": 1,
+      "priorityReasons": [
+        "declaration_panel candidate"
+      ],
+      "annotationStatus": "PENDING",
+      "provenance": "weak_candidate"
+    },
+    {
+      "imageId": "product_007_back",
+      "productId": "product_007",
+      "filePath": "product_007/back.jpg",
+      "view": "back",
+      "category": "unknown",
+      "priority": 1,
+      "priorityReasons": [
+        "declaration_panel candidate"
+      ],
+      "annotationStatus": "PENDING",
+      "provenance": "weak_candidate"
+    },
+    {
+      "imageId": "product_008_back",
+      "productId": "product_008",
+      "filePath": "product_008/back.jpg",
+      "view": "back",
+      "category": "unknown",
+      "priority": 1,
+      "priorityReasons": [
+        "declaration_panel candidate"
+      ],
+      "annotationStatus": "PENDING",
+      "provenance": "weak_candidate"
+    },
+    {
+      "imageId": "product_009_back",
+      "productId": "product_009",
+      "filePath": "product_009/back.jpeg",
+      "view": "back",
+      "category": "unknown",
+      "priority": 1,
+      "priorityReasons": [
+        "declaration_panel candidate"
+      ],
+      "annotationStatus": "PENDING",
+      "provenance": "weak_candidate"
+    },
+    {
+      "imageId": "product_010_back",
+      "productId": "product_010",
+      "filePath": "product_010/back.jpeg",
+      "view": "back",
+      "category": "unknown",
+      "priority": 1,
+      "priorityReasons": [
+        "declaration_panel candidate"
+      ],
+      "annotationStatus": "PENDING",
+      "provenance": "weak_candidate"
+    },
+    {
+      "imageId": "product_001_front",
+      "productId": "product_001",
+      "filePath": "product_001/front.jpeg",
+      "view": "front",
+      "category": "unknown",
+      "priority": 4,
+      "priorityReasons": [
+        "product lacks verified annotation"
+      ],
+      "annotationStatus": "NO_ANNOTATION",
+      "provenance": "none"
+    },
+    {
+      "imageId": "product_002_front",
+      "productId": "product_002",
+      "filePath": "product_002/front.jpeg",
+      "view": "front",
+      "category": "unknown",
+      "priority": 4,
+      "priorityReasons": [
+        "product lacks verified annotation"
+      ],
+      "annotationStatus": "NO_ANNOTATION",
+      "provenance": "none"
+    },
+    {
+      "imageId": "product_003_front",
+      "productId": "product_003",
+      "filePath": "product_003/front.jpg",
+      "view": "front",
+      "category": "unknown",
+      "priority": 4,
+      "priorityReasons": [
+        "product lacks verified annotation"
+      ],
+      "annotationStatus": "NO_ANNOTATION",
+      "provenance": "none"
+    },
+    {
+      "imageId": "product_004_front",
+      "productId": "product_004",
+      "filePath": "product_004/front.jpg",
+      "view": "front",
+      "category": "unknown",
+      "priority": 4,
+      "priorityReasons": [
+        "product lacks verified annotation"
+      ],
+      "annotationStatus": "NO_ANNOTATION",
+      "provenance": "none"
+    },
+    {
+      "imageId": "product_005_front",
+      "productId": "product_005",
+      "filePath": "product_005/front.jpeg",
+      "view": "front",
+      "category": "unknown",
+      "priority": 4,
+      "priorityReasons": [
+        "product lacks verified annotation"
+      ],
+      "annotationStatus": "NO_ANNOTATION",
+      "provenance": "none"
+    },
+    {
+      "imageId": "product_006_front",
+      "productId": "product_006",
+      "filePath": "product_006/front.jpg",
+      "view": "front",
+      "category": "unknown",
+      "priority": 4,
+      "priorityReasons": [
+        "product lacks verified annotation"
+      ],
+      "annotationStatus": "NO_ANNOTATION",
+      "provenance": "none"
+    },
+    {
+      "imageId": "product_007_front",
+      "productId": "product_007",
+      "filePath": "product_007/front.png",
+      "view": "front",
+      "category": "unknown",
+      "priority": 4,
+      "priorityReasons": [
+        "product lacks verified annotation"
+      ],
+      "annotationStatus": "NO_ANNOTATION",
+      "provenance": "none"
+    },
+    {
+      "imageId": "product_008_front",
+      "productId": "product_008",
+      "filePath": "product_008/front.jpg",
+      "view": "front",
+      "category": "unknown",
+      "priority": 4,
+      "priorityReasons": [
+        "product lacks verified annotation"
+      ],
+      "annotationStatus": "NO_ANNOTATION",
+      "provenance": "none"
+    },
+    {
+      "imageId": "product_009_front",
+      "productId": "product_009",
+      "filePath": "product_009/front.jpeg",
+      "view": "front",
+      "category": "unknown",
+      "priority": 4,
+      "priorityReasons": [
+        "product lacks verified annotation"
+      ],
+      "annotationStatus": "NO_ANNOTATION",
+      "provenance": "none"
+    },
+    {
+      "imageId": "product_010_front",
+      "productId": "product_010",
+      "filePath": "product_010/front.jpeg",
+      "view": "front",
+      "category": "unknown",
+      "priority": 4,
+      "priorityReasons": [
+        "product lacks verified annotation"
+      ],
+      "annotationStatus": "NO_ANNOTATION",
+      "provenance": "none"
+    }
+  ],
+  "excluded": {
+    "licenseBlocked": 0,
+    "exactDuplicates": 0,
+    "malformed": 0,
+    "humanVerified": 0,
+    "rejected": 0
+  },
+  "counts": {
+    "totalQueue": 20
+  }
+}

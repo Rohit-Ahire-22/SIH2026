@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Annotation Schema v1",
+  "type": "object",
+  "properties": {
+    "annotationId": { "type": "string", "format": "uuid" },
+    "productId": { "type": "string" },
+    "imageId": { "type": "string" },
+    "source": { "type": "string" },
+    "sourceLicense": { "type": "string" },
+    "classId": { "type": "integer" },
+    "className": { "type": "string" },
+    "boundingBox": {
+      "type": "object",
+      "properties": {
+        "xCenter": { "type": "number", "minimum": 0, "maximum": 1 },
+        "yCenter": { "type": "number", "minimum": 0, "maximum": 1 },
+        "width": { "type": "number", "minimum": 0, "exclusiveMaximum": 1 },
+        "height": { "type": "number", "minimum": 0, "exclusiveMaximum": 1 }
+      },
+      "required": ["xCenter", "yCenter", "width", "height"]
+    },
+    "provenance": {
+      "type": "string",
+      "enum": ["weak_candidate", "human_verified", "human_corrected", "external_human_annotation"]
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["PENDING", "ACCEPTED", "REJECTED", "CORRECTED"]
+    },
+    "reviewerId": { "type": ["string", "null"] },
+    "verifiedAt": { "type": ["string", "null"], "format": "date-time" },
+    "originalBoundingBox": { "type": ["object", "null"] },
+    "originalClassId": { "type": ["integer", "null"] },
+    "reviewNotes": { "type": ["string", "null"] },
+    "trainingEligible": { "type": "boolean" }
+  },
+  "required": [
+    "annotationId", "productId", "imageId", "source", "classId", 
+    "className", "boundingBox", "provenance", "verificationStatus", 
+    "trainingEligible"
+  ]
+}

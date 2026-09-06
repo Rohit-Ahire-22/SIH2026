@@ -1,0 +1,1099 @@
+{
+  "status": "STEP 33 COMPLETE",
+  "metrics": {
+    "products": 10,
+    "images": 20,
+    "totalRuntimeSeconds": 873.208,
+    "ocrSuccess": 19,
+    "ocrFailure": 1,
+    "ocrSuccessRate": 0.95,
+    "avgOcrLatency": 45.95831578947369,
+    "medianOcrLatency": 39.466,
+    "p95OcrLatency": 130.615,
+    "roiCandidates": 7,
+    "roiOcrAttempts": 7,
+    "roiOcrSuccesses": 7,
+    "categoryUnknown": 9,
+    "legalPass": 0,
+    "legalFail": 0,
+    "legalReview": 19,
+    "serviceDeadlock": "NO",
+    "healthRemainedResponsive": "YES",
+    "resourceStable": "YES",
+    "step34Recommendation": "GO"
+  },
+  "fieldCoverage": {
+    "MRP": {
+      "DETECTED": 2,
+      "MISSING": 18,
+      "UNCERTAIN": 0
+    },
+    "Net Quantity": {
+      "DETECTED": 3,
+      "MISSING": 17,
+      "UNCERTAIN": 0
+    },
+    "Batch/Lot Number": {
+      "DETECTED": 3,
+      "MISSING": 17,
+      "UNCERTAIN": 0
+    },
+    "Date of Manufacture": {
+      "DETECTED": 0,
+      "MISSING": 20,
+      "UNCERTAIN": 0
+    },
+    "Date of Packing": {
+      "DETECTED": 0,
+      "MISSING": 20,
+      "UNCERTAIN": 0
+    },
+    "Expiry/Use By": {
+      "DETECTED": 0,
+      "MISSING": 20,
+      "UNCERTAIN": 0
+    },
+    "Country of Origin": {
+      "DETECTED": 4,
+      "MISSING": 16,
+      "UNCERTAIN": 0
+    },
+    "Manufacturer": {
+      "DETECTED": 5,
+      "MISSING": 15,
+      "UNCERTAIN": 0
+    },
+    "Consumer Care": {
+      "DETECTED": 1,
+      "MISSING": 19,
+      "UNCERTAIN": 0
+    }
+  },
+  "failureClassification": {
+    "FULL_OCR_FAILURE": 1,
+    "ROI_OCR_FAILURE": 0,
+    "FIELD_EXTRACTION_FAILURE": 0,
+    "CATEGORY_FAILURE": 0,
+    "LEGAL_ENGINE_FAILURE": 0,
+    "TIMEOUT": 0,
+    "SERVICE_UNAVAILABLE": 0,
+    "INVALID_IMAGE": 0,
+    "OTHER": 0
+  },
+  "categoryDistribution": {
+    "unknown": 9,
+    "food": 9,
+    "personal_care": 2
+  },
+  "data": [
+    {
+      "productId": "product_001",
+      "imageView": "back",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 83,
+        "roiCandidates": 0,
+        "roiDetections": 0,
+        "fusedDetections": 83
+      },
+      "timing": {
+        "fullOcrMs": 83866,
+        "roiOcrMs": 0,
+        "totalMs": 83867
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "MISSING",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "unknown",
+        "categoryConfidence": 0,
+        "categoryDetectionStatus": "UNKNOWN"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_001",
+      "imageView": "front",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 12,
+        "roiCandidates": 0,
+        "roiDetections": 0,
+        "fusedDetections": 12
+      },
+      "timing": {
+        "fullOcrMs": 32796,
+        "roiOcrMs": 0,
+        "totalMs": 32796
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "MISSING",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "unknown",
+        "categoryConfidence": 0,
+        "categoryDetectionStatus": "UNKNOWN"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_002",
+      "imageView": "back",
+      "ocr": {
+        "success": false,
+        "fullImageDetections": 0,
+        "roiCandidates": 0,
+        "roiDetections": 0,
+        "fusedDetections": 0
+      },
+      "timing": {
+        "fullOcrMs": 0,
+        "roiOcrMs": 0,
+        "totalMs": 0
+      },
+      "fields": {},
+      "category": {},
+      "compliance": {},
+      "error": "Full-image OCR failed: OCR result (index 37) is missing field \"text\"",
+      "failureClassification": "OTHER"
+    },
+    {
+      "productId": "product_002",
+      "imageView": "front",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 8,
+        "roiCandidates": 0,
+        "roiDetections": 0,
+        "fusedDetections": 8
+      },
+      "timing": {
+        "fullOcrMs": 20557,
+        "roiOcrMs": 0,
+        "totalMs": 20558
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "MISSING",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "unknown",
+        "categoryConfidence": 0,
+        "categoryDetectionStatus": "UNKNOWN"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_003",
+      "imageView": "back",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 79,
+        "roiCandidates": 1,
+        "roiDetections": 72,
+        "fusedDetections": 84
+      },
+      "timing": {
+        "fullOcrMs": 130615,
+        "roiOcrMs": 0,
+        "totalMs": 130615
+      },
+      "fields": {
+        "MRP": "DETECTED",
+        "Net Quantity": "DETECTED",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "MISSING",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "food",
+        "categoryConfidence": 0.89,
+        "categoryDetectionStatus": "DETECTED"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_003",
+      "imageView": "front",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 6,
+        "roiCandidates": 0,
+        "roiDetections": 0,
+        "fusedDetections": 6
+      },
+      "timing": {
+        "fullOcrMs": 39466,
+        "roiOcrMs": 0,
+        "totalMs": 39466
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "DETECTED",
+        "Manufacturer": "MISSING",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "food",
+        "categoryConfidence": 0.6,
+        "categoryDetectionStatus": "DETECTED"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_004",
+      "imageView": "back",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 86,
+        "roiCandidates": 1,
+        "roiDetections": 2,
+        "fusedDetections": 86
+      },
+      "timing": {
+        "fullOcrMs": 48831,
+        "roiOcrMs": 0,
+        "totalMs": 48832
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "DETECTED",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "food",
+        "categoryConfidence": 0.83,
+        "categoryDetectionStatus": "DETECTED"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_004",
+      "imageView": "front",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 11,
+        "roiCandidates": 0,
+        "roiDetections": 0,
+        "fusedDetections": 11
+      },
+      "timing": {
+        "fullOcrMs": 17921,
+        "roiOcrMs": 0,
+        "totalMs": 17921
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "MISSING",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "food",
+        "categoryConfidence": 0.67,
+        "categoryDetectionStatus": "DETECTED"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_005",
+      "imageView": "back",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 32,
+        "roiCandidates": 1,
+        "roiDetections": 11,
+        "fusedDetections": 38
+      },
+      "timing": {
+        "fullOcrMs": 31123,
+        "roiOcrMs": 0,
+        "totalMs": 31124
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "DETECTED",
+        "Batch/Lot Number": "DETECTED",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "DETECTED",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "food",
+        "categoryConfidence": 0.6,
+        "categoryDetectionStatus": "DETECTED"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_005",
+      "imageView": "front",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 3,
+        "roiCandidates": 0,
+        "roiDetections": 0,
+        "fusedDetections": 3
+      },
+      "timing": {
+        "fullOcrMs": 9433,
+        "roiOcrMs": 0,
+        "totalMs": 9433
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "MISSING",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "unknown",
+        "categoryConfidence": 0,
+        "categoryDetectionStatus": "UNKNOWN"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_006",
+      "imageView": "back",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 63,
+        "roiCandidates": 0,
+        "roiDetections": 0,
+        "fusedDetections": 63
+      },
+      "timing": {
+        "fullOcrMs": 40305,
+        "roiOcrMs": 0,
+        "totalMs": 40304
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "MISSING",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "unknown",
+        "categoryConfidence": 0,
+        "categoryDetectionStatus": "UNKNOWN"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_006",
+      "imageView": "front",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 2,
+        "roiCandidates": 0,
+        "roiDetections": 0,
+        "fusedDetections": 2
+      },
+      "timing": {
+        "fullOcrMs": 23850,
+        "roiOcrMs": 0,
+        "totalMs": 23850
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "MISSING",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "unknown",
+        "categoryConfidence": 0,
+        "categoryDetectionStatus": "UNKNOWN"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_007",
+      "imageView": "back",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 60,
+        "roiCandidates": 1,
+        "roiDetections": 26,
+        "fusedDetections": 71
+      },
+      "timing": {
+        "fullOcrMs": 60738,
+        "roiOcrMs": 0,
+        "totalMs": 60738
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "DETECTED",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "DETECTED",
+        "Consumer Care": "DETECTED"
+      },
+      "category": {
+        "category": "food",
+        "categoryConfidence": 0.71,
+        "categoryDetectionStatus": "DETECTED"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_007",
+      "imageView": "front",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 9,
+        "roiCandidates": 0,
+        "roiDetections": 0,
+        "fusedDetections": 9
+      },
+      "timing": {
+        "fullOcrMs": 10632,
+        "roiOcrMs": 0,
+        "totalMs": 10633
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "MISSING",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "unknown",
+        "categoryConfidence": 0,
+        "categoryDetectionStatus": "UNKNOWN"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_008",
+      "imageView": "back",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 65,
+        "roiCandidates": 1,
+        "roiDetections": 19,
+        "fusedDetections": 73
+      },
+      "timing": {
+        "fullOcrMs": 66967,
+        "roiOcrMs": 0,
+        "totalMs": 66967
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "DETECTED",
+        "Batch/Lot Number": "DETECTED",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "DETECTED",
+        "Manufacturer": "DETECTED",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "food",
+        "categoryConfidence": 0.8,
+        "categoryDetectionStatus": "DETECTED"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_008",
+      "imageView": "front",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 23,
+        "roiCandidates": 0,
+        "roiDetections": 0,
+        "fusedDetections": 23
+      },
+      "timing": {
+        "fullOcrMs": 97564,
+        "roiOcrMs": 0,
+        "totalMs": 97564
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "MISSING",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "food",
+        "categoryConfidence": 0.8,
+        "categoryDetectionStatus": "DETECTED"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_009",
+      "imageView": "back",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 28,
+        "roiCandidates": 1,
+        "roiDetections": 10,
+        "fusedDetections": 27
+      },
+      "timing": {
+        "fullOcrMs": 52426,
+        "roiOcrMs": 0,
+        "totalMs": 52426
+      },
+      "fields": {
+        "MRP": "DETECTED",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "DETECTED",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "personal_care",
+        "categoryConfidence": 0.67,
+        "categoryDetectionStatus": "DETECTED"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_009",
+      "imageView": "front",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 10,
+        "roiCandidates": 0,
+        "roiDetections": 0,
+        "fusedDetections": 10
+      },
+      "timing": {
+        "fullOcrMs": 12106,
+        "roiOcrMs": 0,
+        "totalMs": 12106
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "MISSING",
+        "Manufacturer": "MISSING",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "personal_care",
+        "categoryConfidence": 0.67,
+        "categoryDetectionStatus": "DETECTED"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_010",
+      "imageView": "back",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 42,
+        "roiCandidates": 1,
+        "roiDetections": 16,
+        "fusedDetections": 55
+      },
+      "timing": {
+        "fullOcrMs": 71545,
+        "roiOcrMs": 0,
+        "totalMs": 71545
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "DETECTED",
+        "Manufacturer": "MISSING",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "food",
+        "categoryConfidence": 0.6,
+        "categoryDetectionStatus": "DETECTED"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    },
+    {
+      "productId": "product_010",
+      "imageView": "front",
+      "ocr": {
+        "success": true,
+        "fullImageDetections": 15,
+        "roiCandidates": 0,
+        "roiDetections": 0,
+        "fusedDetections": 15
+      },
+      "timing": {
+        "fullOcrMs": 22463,
+        "roiOcrMs": 0,
+        "totalMs": 22463
+      },
+      "fields": {
+        "MRP": "MISSING",
+        "Net Quantity": "MISSING",
+        "Batch/Lot Number": "MISSING",
+        "Date of Manufacture": "MISSING",
+        "Date of Packing": "MISSING",
+        "Expiry/Use By": "MISSING",
+        "Country of Origin": "DETECTED",
+        "Manufacturer": "MISSING",
+        "Consumer Care": "MISSING"
+      },
+      "category": {
+        "category": "unknown",
+        "categoryConfidence": 0,
+        "categoryDetectionStatus": "UNKNOWN"
+      },
+      "compliance": {
+        "complianceStatus": "REVIEW",
+        "applicabilityStatus": "Chapter II applicability is REVIEW: Cannot determine Chapter II scope due to unrecognized consumer type.",
+        "rulesEvaluated": 12,
+        "reviewReasons": [
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type.",
+          "Cannot determine Chapter II scope due to unrecognized consumer type."
+        ]
+      },
+      "error": null
+    }
+  ]
+}

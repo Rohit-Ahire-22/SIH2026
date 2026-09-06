@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0.0",
+  "classes": [
+    {
+      "id": 0,
+      "name": "product_package",
+      "description": "The visible packaged commodity itself. Bounding box should cover the visible package as tightly as reasonably possible.",
+      "enabled": true
+    },
+    {
+      "id": 1,
+      "name": "principal_display_panel",
+      "description": "The primary/front display surface containing main branding.",
+      "enabled": true
+    },
+    {
+      "id": 2,
+      "name": "declaration_panel",
+      "description": "The visually relevant region containing legal declarations (MRP, dates, manufacturer, net qty). Do not create separate boxes for individual fields.",
+      "enabled": true
+    }
+  ]
+}
