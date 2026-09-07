@@ -44,34 +44,34 @@ def initialize_ocr():
 from app.services.image_preprocessing import preprocess_image
 
 def run_ocr(image_bytes: bytes, variant: str = "original") -> list[dict]:
-    t_start = time.time()
-    image = cv2.imdecode(
-        np.frombuffer(image_bytes, dtype=np.uint8),
-        cv2.IMREAD_COLOR,
-    )
-    if image is None:
-        raise ValueError("Unable to decode image")
-        
-    original_h, original_w = image.shape[:2]
-    max_dim = 1024
-    scale_factor = 1.0
-    
-    # Downscale image to prevent OOM on 512MB Render instances
-    if max(original_h, original_w) > max_dim:
-        scale_factor = max_dim / max(original_h, original_w)
-        new_w = int(original_w * scale_factor)
-        new_h = int(original_h * scale_factor)
-        image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
-        logger.info(f"Downscaled image from {original_w}x{original_h} to {new_w}x{new_h} (scale: {scale_factor:.3f})")
-
-    # Apply preprocessing pipeline
-    processed_image = preprocess_image(image, variant)
-
-    ocr = get_ocr()
-    detections = []
-    result = None
-    
     with _inference_lock:
+        t_start = time.time()
+        image = cv2.imdecode(
+            np.frombuffer(image_bytes, dtype=np.uint8),
+            cv2.IMREAD_COLOR,
+        )
+        if image is None:
+            raise ValueError("Unable to decode image")
+            
+        original_h, original_w = image.shape[:2]
+        max_dim = 1024
+        scale_factor = 1.0
+        
+        # Downscale image to prevent OOM on 512MB Render instances
+        if max(original_h, original_w) > max_dim:
+            scale_factor = max_dim / max(original_h, original_w)
+            new_w = int(original_w * scale_factor)
+            new_h = int(original_h * scale_factor)
+            image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+            logger.info(f"Downscaled image from {original_w}x{original_h} to {new_w}x{new_h} (scale: {scale_factor:.3f})")
+
+        # Apply preprocessing pipeline
+        processed_image = preprocess_image(image, variant)
+
+        ocr = get_ocr()
+        detections = []
+        result = None
+        
         mem_before = psutil.Process(os.getpid()).memory_info().rss / 1024 / 1024
         logger.info(f"OCR inference start. Process RAM: {mem_before:.1f}MB")
         t_inf_start = time.time()
@@ -87,30 +87,30 @@ def run_ocr(image_bytes: bytes, variant: str = "original") -> list[dict]:
         mem_after = psutil.Process(os.getpid()).memory_info().rss / 1024 / 1024
         logger.info(f"OCR inference end. Took {t_inf_end - t_inf_start:.2f}s. Process RAM: {mem_after:.1f}MB")
 
-    if not result:
-        return detections
+        if not result:
+            return detections
 
-    for page in result:
-        texts = _as_list(page["rec_texts"])
-        scores = _as_list(page["rec_scores"])
-        boxes = _as_list(page["rec_boxes"])
-        for text, score, box in zip(texts, scores, boxes):
-            bbox = to_bbox(box)
-            
-            # Upscale bounding box back to original image coordinate space
-            if scale_factor != 1.0:
-                bbox = [[x / scale_factor, y / scale_factor] for x, y in bbox]
+        for page in result:
+            texts = _as_list(page["rec_texts"])
+            scores = _as_list(page["rec_scores"])
+            boxes = _as_list(page["rec_boxes"])
+            for text, score, box in zip(texts, scores, boxes):
+                bbox = to_bbox(box)
                 
-            detections.append(
-                {
-                    "text": str(text),
-                    "confidence": float(score),
-                    "bbox": bbox,
-                }
-            )
-            
-    logger.info(f"OCR complete. Found {len(detections)} texts in {time.time() - t_start:.2f}s total.")
-    return detections
+                # Upscale bounding box back to original image coordinate space
+                if scale_factor != 1.0:
+                    bbox = [[x / scale_factor, y / scale_factor] for x, y in bbox]
+                    
+                detections.append(
+                    {
+                        "text": str(text),
+                        "confidence": float(score),
+                        "bbox": bbox,
+                    }
+                )
+                
+        logger.info(f"OCR complete. Found {len(detections)} texts in {time.time() - t_start:.2f}s total.")
+        return detections
 
 
 def to_bbox(box) -> list[list[float]]:
