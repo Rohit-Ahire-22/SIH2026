@@ -95,9 +95,8 @@ def _adaptive_threshold(img):
     return cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
 
 def _combined(img):
-    # grayscale -> upscale -> contrast enhancement -> light denoise -> light sharpening
+    # grayscale -> upscale -> contrast enhancement -> sharpening
     img_gray = _grayscale(img)
     img_up = _upscale(img_gray)
     img_contrast = _contrast(img_up)
-    img_denoise = _denoise(img_contrast)
-    return _sharpen(img_denoise)
+    return _sharpen(img_contrast)
