@@ -85,10 +85,11 @@ export async function login(req, res, next) {
 
     const token = jwt.sign(payload, secret, { expiresIn: '12h' });
 
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('jwt', token, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none', // Protects against CSRF given strict CORS
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax', // Protects against CSRF given strict CORS
       maxAge: 12 * 60 * 60 * 1000 // 12 hours
     });
 
@@ -130,10 +131,11 @@ export async function me(req, res, next) {
 }
 
 export async function logout(req, res) {
+  const isProduction = process.env.NODE_ENV === 'production';
   res.clearCookie('jwt', {
     httpOnly: true,
-    secure: true,
-    sameSite: 'none'
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax'
   });
   return res.status(200).json({
     success: true,
