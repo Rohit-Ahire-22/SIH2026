@@ -56,7 +56,7 @@ export function extractProductFields(ocrResults) {
   const countryOfOrigin = extractCountry(lines)
   const manufacturerName = extractManufacturer(lines, spatialNodes)
   const consumerCareDetails = extractConsumerCare(lines, spatialNodes)
-  const { brandName, productName } = extractBrandAndProduct(lines)
+  const { brandName, productName } = extractBrandAndProduct(spatialNodes, manufacturerName)
 
   return {
     mrp,
@@ -73,8 +73,16 @@ export function extractProductFields(ocrResults) {
   }
 }
 
-function getSpatialNodes(ocrResults) {
-  return (ocrResults || []).filter(r => r && typeof r.text === 'string' && Array.isArray(r.bbox || r.box)).map(r => ({
+export function getSpatialNodes(ocrResults) {
+  if (!ocrResults || !Array.isArray(ocrResults)) return [];
+  if (ocrResults.length > 0 && typeof ocrResults[0] === 'string') {
+     return ocrResults.map((text, i) => ({
+        text,
+        confidence: 0.9,
+        bbox: [[0, i*20], [100, i*20], [100, i*20+15], [0, i*20+15]]
+     }));
+  }
+  return ocrResults.filter(r => r && typeof r.text === 'string' && Array.isArray(r.bbox || r.box)).map(r => ({
     text: r.text,
     bbox: r.bbox || r.box,
     confidence: r.confidence || 1.0
@@ -204,7 +212,6 @@ function isLabel(lineStr) {
   return false;
 }
 
-// 2D Spatial Extraction Logic
 function find2DField(nodes, labelPattern, valuePattern, rejectPattern, valueExtractor) {
   let candidates = [];
   
@@ -451,8 +458,302 @@ function extractConsumerCare(lines, nodes) {
   });
 }
 
-function extractBrandAndProduct(lines) {
-   return { brandName: null, productName: null };
+const BRAND_LABELS = /(?:^|\W)\s*(?:brand(?:s|ed|ing)?(?:\s+name)?|marketed\s*under|sold\s*under|a\s+product\s+of)\s*[:.\-]?\s*/i;
+const PRODUCT_LABELS = /(?:^|\W)\s*(?:product(?:\s+name|\s+description)?|common\s+name|description|type|variant)\s*[:.\-]?\s*/i;
+const PRODUCT_KEYWORDS = /dishwash|detergent|powder|liquid|paste|cream|shampoo|soap|wash|cleaner|rice|spices|biscuits/i;
+const TRADEMARK_INDICATORS = /®|™|registered\s+trademark|trademark/i;
+const GENERIC_PROMOTIONAL_WORDS = /^(?:new|fresh|premium|classic|natural|power|easy|super|ultra|mega|active|plus|pro|advanced|expert|pure|clean|shine|glow|excel|perfect|magic|smart|strong|soft|gentle|care|defense|protect|shield|max|extra|gold|silver|platinum|organic|herbal|ayurvedic)$/i;
+
+const GENERAL_NEGATIVE_PATTERNS = [
+  ...COUNTRY_PATTERNS,
+  ...MANUFACTURER_PATTERNS,
+  CONSUMER_CARE_PATTERN,
+  EMAIL_PATTERN,
+  PHONE_PATTERN,
+  /po\s+box|pin\s*\d{6}|www\.|.com/i,
+  MRP_LABEL,
+  NET_QTY_LABEL,
+  BATCH_LABEL,
+  ...Object.values(DATE_LABELS),
+  /ingredients|nutrition|facts/i,
+  /manufactur(?:ed|ing)\s+in|packed\s+in|imported\s+in/i,
+  /keep\s+(?:away|out)|store\s+(?:in|away)|lab\s+test/i,
+  /dist(?:\.|rict)|estate|plot|floor|building|mumbai|delhi|bangalore|hyderabad|chennai/i
+];
+
+function isNegativeCandidate(text, manufacturerName) {
+   if (!text || text.length < 2) return true;
+   for (const p of GENERAL_NEGATIVE_PATTERNS) {
+      if (p.test(text)) return true;
+   }
+   if (manufacturerName && manufacturerName.value) {
+      const textClean = text.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+      const mfgClean = manufacturerName.value.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+      if (textClean.length > 4 && (mfgClean.includes(textClean) || textClean.includes(mfgClean))) return true;
+   }
+   const numericDensity = (text.match(/\d/g) || []).length / text.length;
+   if (numericDensity > 0.4) return true;
+   return false;
+}
+
+export function extractBrandAndProduct(nodes, manufacturerName) {
+   const rawBoxes = nodes.filter(n => n.bbox && n.text);
+   if (rawBoxes.length === 0) return { brandName: null, productName: null };
+   const fontSizes = rawBoxes.map(b => getFontSize(b.bbox)).sort((a,b) => a-b);
+   const medianFontSize = fontSizes[Math.floor((fontSizes.length - 1) / 2)];
+
+   let brandCandidate = null;
+   let brandScore = 0;
+
+   // 1. Find Brand
+   for (let i = 0; i < rawBoxes.length; i++) {
+       const box = rawBoxes[i];
+       if (isNegativeCandidate(box.text, manufacturerName)) continue;
+
+       let score = 0;
+       const signals = [];
+
+       const size = getFontSize(box.bbox);
+       if (size > medianFontSize * 1.5) {
+           score += 2;
+           signals.push("large_prominent_text");
+       } else if (size > medianFontSize * 1.2) {
+           score += 1;
+           signals.push("prominent_text");
+       }
+
+       if (box.confidence > 0.9) {
+           score += 1;
+           signals.push("high_confidence");
+       } else if (box.confidence < 0.6) {
+           score -= 2;
+       }
+
+       if (TRADEMARK_INDICATORS.test(box.text)) {
+           score += 4;
+           signals.push("trademark_context_inside");
+       }
+       if (BRAND_LABELS.test(box.text)) {
+           score += 4;
+           signals.push("explicit_brand_label_inside");
+       }
+
+       const neighbors = rawBoxes
+         .filter(b => b !== box)
+         .map(b => ({ box: b, dist: computeDistance(box.bbox, b.bbox) }))
+         .filter(n => n.dist > 0 && n.dist < size * 10);
+
+       for (const n of neighbors) {
+           if (BRAND_LABELS.test(n.box.text)) {
+               score += 5;
+               signals.push("explicit_brand_label_nearby");
+           }
+           if (TRADEMARK_INDICATORS.test(n.box.text) && n.dist < size * 6) {
+               score += 3;
+               signals.push("trademark_nearby");
+               if (box.text.length > 2 && n.box.text.toLowerCase().includes(box.text.toLowerCase())) {
+                   score += 5;
+                   signals.push("trademark_contains_candidate");
+               }
+           }
+       }
+
+       if (/^[A-Za-z\s]+$/.test(box.text)) {
+           score += 1;
+           signals.push("clean_alphabetic_text");
+       }
+       
+       const isGeneric = GENERIC_PROMOTIONAL_WORDS.test(box.text.trim());
+       if (isGeneric) {
+           score -= 4;
+           signals.push("generic_promotional_word");
+       }
+       
+       if (box.text.length > 20) score -= 3;
+
+       const hasStrongSemanticEvidence = signals.some(s => s.includes("explicit_brand_label") || s.includes("trademark"));
+       
+       let status = hasStrongSemanticEvidence ? 'PASS' : 'REVIEW';
+       if (isGeneric) {
+           status = 'REVIEW'; // Never PASS a standalone generic word
+       }
+       
+       let extractionConfidence = box.confidence;
+       if (!hasStrongSemanticEvidence) {
+           // Cap extraction confidence if there's no semantic evidence to avoid false certainty
+           extractionConfidence = Math.min(box.confidence, 0.6);
+       } else if (isGeneric) {
+           // Even with semantic evidence, cap generic words to represent uncertainty of partial extraction
+           extractionConfidence = Math.min(box.confidence, 0.75);
+       }
+
+       if (score >= 4 && score > brandScore) {
+           brandScore = score;
+           brandCandidate = {
+               value: box.text.replace(TRADEMARK_INDICATORS, '').replace(BRAND_LABELS, '').trim(),
+               evidence: box.text,
+               bbox: box.bbox,
+               confidence: extractionConfidence,
+               status: status,
+               source: 'computed',
+               score,
+               signals
+           };
+       }
+   }
+   
+   if (brandCandidate) {
+       const anchorSize = getFontSize(brandCandidate.bbox);
+       const neighbors = rawBoxes
+         .filter(b => b.text !== brandCandidate.evidence && !isNegativeCandidate(b.text, manufacturerName))
+         .map(b => ({ box: b, dist: computeDistance(brandCandidate.bbox, b.bbox) }))
+         .filter(n => n.dist > 0 && n.dist < anchorSize * 4)
+         .sort((a,b) => a.dist - b.dist);
+         
+       for (const n of neighbors) {
+           const nSize = getFontSize(n.box.bbox);
+           if (nSize > anchorSize * 0.7 && nSize < anchorSize * 1.3) {
+               if (/^[A-Za-z]+$/.test(n.box.text) && !PRODUCT_KEYWORDS.test(n.box.text)) {
+                   const comesBefore = n.box.bbox[0][1] < brandCandidate.bbox[0][1] - anchorSize * 0.5 || 
+                                       (Math.abs(n.box.bbox[0][1] - brandCandidate.bbox[0][1]) < anchorSize * 0.5 && n.box.bbox[0][0] < brandCandidate.bbox[0][0]);
+                   if (comesBefore) {
+                       brandCandidate.value = n.box.text + ' ' + brandCandidate.value;
+                   } else {
+                       brandCandidate.value += ' ' + n.box.text;
+                   }
+                   brandCandidate.evidence += ' ' + n.box.text;
+                   brandCandidate.bbox = computeBoundingBox([brandCandidate.bbox, n.box.bbox]);
+                   brandCandidate.signals.push("multi_token_grouped");
+                   break;
+               }
+           }
+       }
+   }
+
+   // 2. Find Product
+   let productCandidate = null;
+   let productScore = 0;
+
+   for (let i = 0; i < rawBoxes.length; i++) {
+       const box = rawBoxes[i];
+       if (brandCandidate && box.text === brandCandidate.evidence) continue;
+       if (isNegativeCandidate(box.text, manufacturerName)) continue;
+
+       let score = 0;
+       const signals = [];
+
+       const size = getFontSize(box.bbox);
+       if (size > medianFontSize * 1.2) {
+           score += 1;
+           signals.push("prominent_text");
+       }
+
+       if (box.confidence > 0.9) {
+           score += 1;
+           signals.push("high_confidence");
+       } else if (box.confidence < 0.6) {
+           score -= 2;
+       }
+
+       if (PRODUCT_KEYWORDS.test(box.text)) {
+           score += 3;
+           signals.push("commodity_keyword");
+       }
+
+       if (brandCandidate) {
+           const dist = computeDistance(box.bbox, brandCandidate.bbox);
+           if (dist < size * 5) {
+               score += 2;
+               signals.push("near_brand");
+           }
+       }
+
+       const neighbors = rawBoxes
+         .filter(b => b !== box)
+         .map(b => ({ box: b, dist: computeDistance(box.bbox, b.bbox) }))
+         .filter(n => n.dist > 0 && n.dist < size * 10);
+
+       let keywordNearbyAdded = false;
+       for (const n of neighbors) {
+           if (PRODUCT_LABELS.test(n.box.text)) {
+               score += 5;
+               signals.push("explicit_product_label_nearby");
+           }
+           if (!keywordNearbyAdded && PRODUCT_KEYWORDS.test(n.box.text) && n.dist < size * 6) {
+               score += 1;
+               signals.push("commodity_keyword_nearby");
+               keywordNearbyAdded = true;
+           }
+       }
+
+       if (box.text.length > 20) score -= 3;
+       
+       if (score >= 4 && score > productScore) {
+           productScore = score;
+           productCandidate = {
+               value: box.text.replace(PRODUCT_LABELS, '').trim(),
+               evidence: box.text,
+               bbox: box.bbox,
+               confidence: box.confidence,
+               status: score >= 6 ? 'PASS' : 'REVIEW',
+               source: 'computed',
+               score,
+               signals
+           };
+       }
+   }
+   
+   if (productCandidate) {
+       const anchorSize = getFontSize(productCandidate.bbox);
+       const neighbors = rawBoxes
+         .filter(b => b.text !== productCandidate.evidence && !isNegativeCandidate(b.text, manufacturerName))
+         .filter(b => brandCandidate ? b.text !== brandCandidate.evidence : true)
+         .map(b => ({ box: b, dist: computeDistance(productCandidate.bbox, b.bbox) }))
+         .filter(n => n.dist > 0 && n.dist < anchorSize * 4)
+         .sort((a,b) => a.dist - b.dist);
+         
+       for (const n of neighbors) {
+           const nSize = getFontSize(n.box.bbox);
+           if (nSize > anchorSize * 0.7 && nSize < anchorSize * 1.3) {
+               if (PRODUCT_KEYWORDS.test(n.box.text) || /^[A-Za-z]+$/.test(n.box.text)) {
+                   const comesBefore = n.box.bbox[0][1] < productCandidate.bbox[0][1] - anchorSize * 0.5 || 
+                                       (Math.abs(n.box.bbox[0][1] - productCandidate.bbox[0][1]) < anchorSize * 0.5 && n.box.bbox[0][0] < productCandidate.bbox[0][0]);
+                   if (comesBefore) {
+                       productCandidate.value = n.box.text + ' ' + productCandidate.value;
+                   } else {
+                       productCandidate.value += ' ' + n.box.text;
+                   }
+                   productCandidate.evidence += ' ' + n.box.text;
+                   productCandidate.bbox = computeBoundingBox([productCandidate.bbox, n.box.bbox]);
+                   productCandidate.confidence = averageConfidence([productCandidate.confidence, n.box.confidence]);
+                   productCandidate.signals.push("multi_token_grouped");
+                   break;
+               }
+           }
+       }
+   }
+
+   const finalBrand = brandCandidate && brandCandidate.value ? {
+       value: brandCandidate.value,
+       confidence: brandCandidate.confidence,
+       evidence: brandCandidate.evidence,
+       bbox: brandCandidate.bbox,
+       source: brandCandidate.source,
+       status: brandCandidate.status,
+       signals: brandCandidate.signals
+   } : null;
+
+   const finalProduct = productCandidate && productCandidate.value ? {
+       value: productCandidate.value,
+       confidence: productCandidate.confidence,
+       evidence: productCandidate.evidence,
+       bbox: productCandidate.bbox,
+       source: productCandidate.source,
+       status: productCandidate.status,
+       signals: productCandidate.signals
+   } : null;
+
+   return { brandName: finalBrand, productName: finalProduct };
 }
 
 function stripTrailingPeriod(value) {
