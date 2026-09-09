@@ -64,7 +64,31 @@ export async function evaluateRule11(product, context, asOfDate = new Date()) {
     }
   }
 
-  return results
+  function statusRank(status) {
+    const order = { [FAIL]: 1, [REVIEW]: 2, [PASS]: 3, [NOT_APPLICABLE]: 4, [PENDING]: 5 }
+    return order[status] ?? 5
+  }
+
+  function worstStatus(statuses) {
+    const executed = statuses.filter((s) => s !== NOT_APPLICABLE)
+    if (executed.length === 0) return NOT_APPLICABLE
+    return executed.sort((a, b) => statusRank(a) - statusRank(b))[0]
+  }
+
+  const overallStatus = worstStatus(results.map(r => r.status))
+  const applicableCount = results.filter((c) => c.status !== NOT_APPLICABLE).length
+  const reason = overallStatus === NOT_APPLICABLE 
+    ? 'Rule 11 not applicable.' 
+    : `Rule 11 evaluated on ${asOfDate.toISOString().slice(0,10)}; ${applicableCount} applicable clause checks.`
+
+  return {
+    ruleNumber: '11',
+    status: overallStatus,
+    asOfDate,
+    reason,
+    source: createLegalSource({ ruleNumber: '11' }),
+    checks: results
+  }
 }
 
 function evaluateNetQuantityExpression(clause, product, context) {

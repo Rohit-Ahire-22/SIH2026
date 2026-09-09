@@ -6,9 +6,14 @@ import { evaluateRules789 } from '../legal/compliance/rule789ComplianceService.j
 import { evaluateRule11 } from '../legal/compliance/rule11ComplianceService.js'
 import Product from '../models/Product.js'
 
-function getWorstStatus(statuses) {
-  const rank = { 'FAIL': 1, 'REVIEW': 2, 'PASS': 3, 'NOT_APPLICABLE': 4, 'PENDING': 5 }
-  return statuses.sort((a, b) => (rank[a] || 5) - (rank[b] || 5))[0] || 'REVIEW'
+function getOverallComplianceStatus(statuses) {
+  if (statuses.includes('FAIL')) return 'NON_COMPLIANT'
+  if (statuses.includes('REVIEW') || statuses.includes('PENDING')) return 'REVIEW'
+  
+  const applicableStatuses = statuses.filter(s => s === 'PASS' || s === 'FAIL')
+  if (applicableStatuses.length === 0) return 'REVIEW' // No confidently applicable rules
+
+  return 'COMPLIANT'
 }
 
 export class AnalysisOrchestrationService {
@@ -51,21 +56,30 @@ export class AnalysisOrchestrationService {
       let extracted = {}
       if (ocrDetections.length > 0) {
         extracted = extractProductFields(ocrDetections)
+        
+        // Save the raw rich extraction objects to metadata for compliance/evidence tracking
+        product.metadata = product.metadata || {}
+        product.metadata.extractedFields = extracted
+
         // Apply fields deterministically without fabricating if missing
-        if (extracted.mrp != null) product.mrp = extracted.mrp
-        if (extracted.netQuantity != null) product.netQuantity = extracted.netQuantity
-        if (extracted.batchLotNumber != null) product.batchLotNumber = extracted.batchLotNumber
-        if (extracted.dateOfManufacture != null) product.dateOfManufacture = extracted.dateOfManufacture
-        if (extracted.dateOfPacking != null) product.dateOfPacking = extracted.dateOfPacking
-        if (extracted.expiryOrUseByDate != null) product.expiryOrUseByDate = extracted.expiryOrUseByDate
-        if (extracted.countryOfOrigin != null) product.countryOfOrigin = extracted.countryOfOrigin
-        if (extracted.manufacturerName != null) product.manufacturerName = extracted.manufacturerName
-        if (extracted.consumerCareDetails != null) {
+        if (extracted.mrp != null && extracted.mrp.value !== 'REVIEW') product.mrp = extracted.mrp.value
+        if (extracted.netQuantity != null && extracted.netQuantity.value !== 'REVIEW') {
+           product.netQuantity = { value: extracted.netQuantity.value, unit: extracted.netQuantity.unit }
+        }
+        if (extracted.batchLotNumber != null && extracted.batchLotNumber.value !== 'REVIEW') product.batchLotNumber = extracted.batchLotNumber.value
+        if (extracted.dateOfManufacture != null && extracted.dateOfManufacture.value !== 'REVIEW') product.dateOfManufacture = extracted.dateOfManufacture.value
+        if (extracted.dateOfPacking != null && extracted.dateOfPacking.value !== 'REVIEW') product.dateOfPacking = extracted.dateOfPacking.value
+        if (extracted.expiryOrUseByDate != null && extracted.expiryOrUseByDate.value !== 'REVIEW') product.expiryOrUseByDate = extracted.expiryOrUseByDate.value
+        if (extracted.countryOfOrigin != null && extracted.countryOfOrigin.value !== 'REVIEW') product.countryOfOrigin = extracted.countryOfOrigin.value
+        if (extracted.manufacturerName != null && extracted.manufacturerName.value !== 'REVIEW') product.manufacturerName = extracted.manufacturerName.value
+        if (extracted.consumerCareDetails != null && extracted.consumerCareDetails.value !== 'REVIEW') {
           product.consumerCareDetails = {
             ...(product.consumerCareDetails || {}),
-            ...extracted.consumerCareDetails,
+            ...extracted.consumerCareDetails.value,
           }
         }
+        if (extracted.brandName != null && extracted.brandName.value !== 'REVIEW') product.brandName = extracted.brandName.value
+        if (extracted.productName != null && extracted.productName.value !== 'REVIEW') product.productName = extracted.productName.value
       }
 
       // 3. Category Detection
@@ -79,7 +93,9 @@ export class AnalysisOrchestrationService {
       const categoryResult = detectProductCategory(categoryContext)
       product.category = categoryResult.category
       product.categoryConfidence = categoryResult.confidence
-      product.categoryMatchedKeywords = categoryResult.matchedKeywords
+      product.categoryMatchedKeywords = categoryResult.matchedSignals.map(s => 
+        `${s.category}: ${s.signal} -> ${s.layer} -> +${s.weight}`
+      )
       product.categoryDetectionStatus = categoryResult.status
 
       // 4. Legal Metrology Applicability & Rule Evaluation
@@ -88,7 +104,7 @@ export class AnalysisOrchestrationService {
         consumerType: 'RETAIL',
         packageType: 'PRE_PACKAGED',
         importStatus: 'DOMESTIC',
-        domain: categoryResult.category !== 'unknown' ? categoryResult.category : 'food',
+        domain: categoryResult.category, // Do not default unknown to 'food'
         quantityValue: product.netQuantity?.value,
         quantityUnit: product.netQuantity?.unit,
         asOfDate: new Date()
@@ -98,7 +114,7 @@ export class AnalysisOrchestrationService {
       const r789 = evaluateRules789({ product: product.toObject(), context: legalContext, asOfDate: new Date() })
       const r11 = await evaluateRule11(product.toObject(), legalContext, new Date())
 
-      const overallStatus = getWorstStatus([r6.status, r789.status, r11.status])
+      const overallStatus = getOverallComplianceStatus([r6.status, r789.status, r11.status])
       
       product.complianceStatus = overallStatus
       product.complianceDetails = {
