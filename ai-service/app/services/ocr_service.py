@@ -43,6 +43,27 @@ def initialize_ocr():
 
 from app.services.image_preprocessing import preprocess_image
 
+def _get_ai_max_dim() -> int:
+    """Return the configurable maximum image dimension (default 2048).
+
+    Falls back to 2048 if the AI_MAX_DIM environment variable is unset,
+    invalid, or not a positive integer.
+    """
+    raw = os.environ.get("AI_MAX_DIM", "")
+    if not raw:
+        logger.info("AI_MAX_DIM not set. Using default 2048.")
+        return 2048
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        logger.warning(f"Invalid AI_MAX_DIM '{raw}'. Falling back to 2048.")
+        return 2048
+    if value <= 0:
+        logger.warning(f"AI_MAX_DIM {value} out of range. Falling back to 2048.")
+        return 2048
+    return value
+
+
 def run_ocr(image_bytes: bytes, variant: str = "original") -> list[dict]:
     with _inference_lock:
         t_start = time.time()
@@ -54,7 +75,7 @@ def run_ocr(image_bytes: bytes, variant: str = "original") -> list[dict]:
             raise ValueError("Unable to decode image")
             
         original_h, original_w = image.shape[:2]
-        max_dim = 1024
+        max_dim = _get_ai_max_dim()
         scale_factor = 1.0
         
         # Downscale image to prevent OOM on 512MB Render instances
@@ -67,6 +88,14 @@ def run_ocr(image_bytes: bytes, variant: str = "original") -> list[dict]:
 
         # Apply preprocessing pipeline
         processed_image = preprocess_image(image, variant)
+        processed_h, processed_w = processed_image.shape[:2]
+
+        # Total scale from the ORIGINAL image to the image actually fed to OCR.
+        # This accounts for the downscale above AND any dimension-changing
+        # preprocessing (e.g. the "upscale" / "combined" variants).
+        # Fall back to scale_factor if a dimension is unexpectedly zero.
+        scale_x = (processed_w / original_w) if original_w > 0 else scale_factor
+        scale_y = (processed_h / original_h) if original_h > 0 else scale_factor
 
         ocr = get_ocr()
         detections = []
@@ -78,10 +107,16 @@ def run_ocr(image_bytes: bytes, variant: str = "original") -> list[dict]:
         
         try:
             result = ocr.predict(processed_image)
-        except Exception as e:
-            logger.error(f"OCR inference failed gracefully: {str(e)}")
-            # Return empty detections instead of crashing the FastAPI worker if it's a catchable MemoryError
+        except MemoryError as e:
+            logger.exception("OCR inference failed: out of memory")
+            # MemoryError is potentially recoverable; return empty detections
+            # instead of crashing the FastAPI worker. Do not expose details to the client.
             return []
+        except Exception:
+            # Any other failure should NOT be silently treated as a successful
+            # empty OCR result. Log the full traceback server-side only.
+            logger.exception("OCR inference failed with an unexpected error")
+            raise
             
         t_inf_end = time.time()
         mem_after = psutil.Process(os.getpid()).memory_info().rss / 1024 / 1024
@@ -91,23 +126,60 @@ def run_ocr(image_bytes: bytes, variant: str = "original") -> list[dict]:
             return detections
 
         for page in result:
-            texts = _as_list(page["rec_texts"])
-            scores = _as_list(page["rec_scores"])
-            boxes = _as_list(page["rec_boxes"])
-            for text, score, box in zip(texts, scores, boxes):
-                bbox = to_bbox(box)
+            if not isinstance(page, dict):
+                continue
                 
-                # Upscale bounding box back to original image coordinate space
-                if scale_factor != 1.0:
-                    bbox = [[x / scale_factor, y / scale_factor] for x, y in bbox]
+            texts = _as_list(page.get("rec_texts", []))
+            scores = _as_list(page.get("rec_scores", []))
+            boxes = _as_list(page.get("rec_boxes", []))
+            
+            # Ensure we iterate up to the maximum length to catch mismatches if they occur
+            max_len = max(len(texts), len(scores), len(boxes))
+            
+            for i in range(max_len):
+                try:
+                    # Safely get items or None if out of bounds
+                    text = texts[i] if i < len(texts) else None
+                    score = scores[i] if i < len(scores) else None
+                    box = boxes[i] if i < len(boxes) else None
+
+                    if text is None or str(text).strip() == "":
+                        logger.warning(f"Skipping detection {i}: missing or empty text")
+                        continue
+                        
+                    if score is None:
+                        logger.warning(f"Skipping detection {i}: missing confidence score")
+                        continue
+                        
+                    try:
+                        confidence = float(score)
+                    except (ValueError, TypeError):
+                        logger.warning(f"Skipping detection {i}: malformed confidence score '{score}'")
+                        continue
+                        
+                    if box is None or len(box) == 0:
+                        logger.warning(f"Skipping detection {i}: missing or empty bbox")
+                        continue
+                        
+                    bbox = to_bbox(box)
                     
-                detections.append(
-                    {
-                        "text": str(text),
-                        "confidence": float(score),
-                        "bbox": bbox,
-                    }
-                )
+                    # Map bounding box from the processed/OCR coordinate space
+                    # back to the ORIGINAL image coordinate space. Using the
+                    # processed-to-original dimension ratio is exact for the
+                    # downscale AND any dimension-changing preprocessing.
+                    if scale_x != 1.0 or scale_y != 1.0:
+                        bbox = [[x / scale_x, y / scale_y] for x, y in bbox]
+                        
+                    detections.append(
+                        {
+                            "text": str(text),
+                            "confidence": confidence,
+                            "bbox": bbox,
+                        }
+                    )
+                except Exception as e:
+                    logger.warning(f"Skipping detection {i}: malformed data - {str(e)}")
+                    continue
                 
         logger.info(f"OCR complete. Found {len(detections)} texts in {time.time() - t_start:.2f}s total.")
         return detections

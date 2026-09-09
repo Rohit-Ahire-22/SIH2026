@@ -60,7 +60,7 @@ def _upscale(img):
         logger.warning(f"Upscale skipped: {new_w}x{new_h} exceeds {CONFIG['MAX_PIXELS']} max pixels")
         return img
         
-    return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
+    return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_LANCZOS4)
 
 def _contrast(img):
     if len(img.shape) == 3:

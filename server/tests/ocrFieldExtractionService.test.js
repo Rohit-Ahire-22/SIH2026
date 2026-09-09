@@ -10,9 +10,17 @@ test('Test 1: MRP, net quantity, batch', () => {
     'Batch: ABC123',
   ])
 
-  assert.equal(fields.mrp, 250)
-  assert.deepEqual(fields.netQuantity, { value: 500, unit: 'g' })
-  assert.equal(fields.batchLotNumber, 'ABC123')
+  assert.equal(fields.mrp.value, 250)
+  assert.equal(fields.mrp.currency, 'INR')
+  assert.equal(fields.mrp.evidence, 'MRP Rs 250.00')
+
+  assert.deepEqual(fields.netQuantity.value, 500)
+  assert.equal(fields.netQuantity.unit, 'g')
+  assert.equal(fields.netQuantity.evidence, 'Net Quantity 500 g')
+
+  assert.equal(fields.batchLotNumber.value, 'ABC123')
+  assert.equal(fields.batchLotNumber.evidence, 'Batch: ABC123')
+
   assert.equal(fields.dateOfManufacture, null)
   assert.equal(fields.dateOfPacking, null)
   assert.equal(fields.expiryOrUseByDate, null)
@@ -28,9 +36,10 @@ test('Test 2: rupee symbol, kg unit, lot number', () => {
     'Lot No: XYZ789',
   ])
 
-  assert.equal(fields.mrp, 129)
-  assert.deepEqual(fields.netQuantity, { value: 1, unit: 'kg' })
-  assert.equal(fields.batchLotNumber, 'XYZ789')
+  assert.equal(fields.mrp.value, 129)
+  assert.equal(fields.netQuantity.value, 1)
+  assert.equal(fields.netQuantity.unit, 'kg')
+  assert.equal(fields.batchLotNumber.value, 'XYZ789')
 })
 
 test('Test 3: dates, country, manufacturer, consumer care', () => {
@@ -44,12 +53,12 @@ test('Test 3: dates, country, manufacturer, consumer care', () => {
     'Consumer Care: Toll Free 1800-123-4567 care@foodco.in',
   ])
 
-  assert.equal(fields.dateOfManufacture, '2025-08-15')
-  assert.equal(fields.dateOfPacking, '2025-09-02')
-  assert.equal(fields.expiryOrUseByDate, '2027-01-01')
-  assert.equal(fields.countryOfOrigin, 'India')
-  assert.equal(fields.manufacturerName, 'FoodCo Pvt Ltd')
-  assert.deepEqual(fields.consumerCareDetails, {
+  assert.equal(fields.dateOfManufacture.value, '2025-08-15')
+  assert.equal(fields.dateOfPacking.value, '2025-09-02')
+  assert.equal(fields.expiryOrUseByDate.value, '2027-01-01') // It takes the first one matched, which is Use By or Best Before
+  assert.equal(fields.countryOfOrigin.value, 'India')
+  assert.equal(fields.manufacturerName.value, 'FoodCo Pvt Ltd')
+  assert.deepEqual(fields.consumerCareDetails.value, {
     phone: '1800-123-4567',
     email: 'care@foodco.in',
   })
@@ -62,26 +71,26 @@ test('Test 3b: best-before dot format, made-in, mfd by', () => {
     'Mfd by: ABC Foods Ltd',
   ])
 
-  assert.equal(fields.expiryOrUseByDate, '2026-12-31')
-  assert.equal(fields.countryOfOrigin, 'Bangladesh')
-  assert.equal(fields.manufacturerName, 'ABC Foods Ltd')
+  assert.equal(fields.expiryOrUseByDate.value, '2026-12-31')
+  assert.equal(fields.countryOfOrigin.value, 'Bangladesh')
+  assert.equal(fields.manufacturerName.value, 'ABC Foods Ltd')
 })
 
 test('Test 3c: MRP variants and unit variants', () => {
-  assert.equal(extractProductFields(['M.R.P. Rs. 250']).mrp, 250)
-  assert.equal(extractProductFields(['Maximum Retail Price Rs 250']).mrp, 250)
-  assert.deepEqual(extractProductFields(['Net Weight 250 ml']).netQuantity, {
-    value: 250,
-    unit: 'ml',
-  })
-  assert.deepEqual(extractProductFields(['Net Wt. 500 g']).netQuantity, {
-    value: 500,
-    unit: 'g',
-  })
-  assert.deepEqual(extractProductFields(['Net Qty: 1 L']).netQuantity, {
-    value: 1,
-    unit: 'l',
-  })
+  assert.equal(extractProductFields(['M.R.P. Rs. 250']).mrp.value, 250)
+  assert.equal(extractProductFields(['Maximum Retail Price Rs 250']).mrp.value, 250)
+  
+  const v1 = extractProductFields(['Net Weight 250 ml']).netQuantity
+  assert.equal(v1.value, 250)
+  assert.equal(v1.unit, 'ml')
+
+  const v2 = extractProductFields(['Net Wt. 500 g']).netQuantity
+  assert.equal(v2.value, 500)
+  assert.equal(v2.unit, 'g')
+
+  const v3 = extractProductFields(['Net Qty: 1 L']).netQuantity
+  assert.equal(v3.value, 1)
+  assert.equal(v3.unit, 'l')
 })
 
 test('Test 3d: no invented dates when parsing is not confident', () => {
@@ -93,6 +102,14 @@ test('Test 3d: no invented dates when parsing is not confident', () => {
 
   assert.equal(fields.dateOfManufacture, null)
   assert.equal(fields.expiryOrUseByDate, null)
+})
+
+test('Test 3e: "See Top/Seal" returns REVIEW instead of inventing', () => {
+  const fields = extractProductFields([
+    'MFD. & Batch No.: See Top/Seal',
+  ])
+  assert.equal(fields.dateOfManufacture.value, 'REVIEW')
+  assert.equal(fields.batchLotNumber.value, 'REVIEW')
 })
 
 test('Test 4: unrecognizable OCR text yields no invented values', () => {
@@ -112,6 +129,8 @@ test('Test 4: unrecognizable OCR text yields no invented values', () => {
     countryOfOrigin: null,
     manufacturerName: null,
     consumerCareDetails: null,
+    brandName: null,
+    productName: null
   })
 })
 
@@ -121,6 +140,22 @@ test('Test 4b: accepts OCR result objects with .text', () => {
     { text: 'Batch No: A1B2', confidence: 0.9, bbox: [] },
   ])
 
-  assert.equal(fields.mrp, 200)
-  assert.equal(fields.batchLotNumber, 'A1B2')
+  assert.equal(fields.mrp.value, 200)
+  assert.equal(fields.batchLotNumber.value, 'A1B2')
+})
+
+test('Test 5: MRP inclusive of all taxes', () => {
+  const fields = extractProductFields([
+    '*MRP20/-Incl.of all taxes',
+  ])
+  assert.equal(fields.mrp.value, 20)
+  assert.equal(fields.mrp.inclusiveOfTaxes, true)
+})
+
+test('Test 6: Reject PIN code for phone number', () => {
+  const fields = extractProductFields([
+    'PO BOX 14760, MUMBAI 400099',
+    'Customer Care: 400099'
+  ])
+  assert.equal(fields.consumerCareDetails, null)
 })
