@@ -42,7 +42,9 @@ function LandingPage() {
 
   const getStatusIcon = (status) => {
     switch (status) {
+      case 'COMPLIANT':
       case 'PASS': return <CheckCircle className="text-green-500" size={18} />;
+      case 'NON_COMPLIANT':
       case 'FAIL': return <XCircle className="text-red-500" size={18} />;
       case 'REVIEW': return <AlertCircle className="text-amber-500" size={18} />;
       default: return <Clock className="text-gray-400" size={18} />;
@@ -51,7 +53,9 @@ function LandingPage() {
 
   const getStatusColor = (status) => {
     switch (status) {
+      case 'COMPLIANT':
       case 'PASS': return 'bg-green-100 text-green-800 border-green-200';
+      case 'NON_COMPLIANT':
       case 'FAIL': return 'bg-red-100 text-red-800 border-red-200';
       case 'REVIEW': return 'bg-amber-100 text-amber-800 border-amber-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';

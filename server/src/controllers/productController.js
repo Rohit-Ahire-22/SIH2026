@@ -43,8 +43,11 @@ export async function listProducts(req, res, next) {
       ]
     }
 
-    // Filters
-    if (req.query.status) query.complianceStatus = req.query.status
+    // Filters (map legacy PASS/FAIL vocabulary to persisted COMPLIANT/NON_COMPLIANT)
+    if (req.query.status) {
+      const statusMap = { PASS: 'COMPLIANT', FAIL: 'NON_COMPLIANT' }
+      query.complianceStatus = statusMap[req.query.status] || req.query.status
+    }
     if (req.query.analysisStatus) query.analysisStatus = req.query.analysisStatus
     if (req.query.category) query.category = req.query.category
 
@@ -105,8 +108,8 @@ export async function getAnalytics(req, res, next) {
           $group: {
             _id: null,
             total: { $sum: 1 },
-            pass: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'PASS'] }, 1, 0] } },
-            fail: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'FAIL'] }, 1, 0] } },
+            pass: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'COMPLIANT'] }, 1, 0] } },
+            fail: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'NON_COMPLIANT'] }, 1, 0] } },
             review: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'REVIEW'] }, 1, 0] } },
             pending: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'PENDING'] }, 1, 0] } },
           }
@@ -127,8 +130,8 @@ export async function getAnalytics(req, res, next) {
           $group: {
             _id: '$category',
             total: { $sum: 1 },
-            pass: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'PASS'] }, 1, 0] } },
-            fail: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'FAIL'] }, 1, 0] } },
+            pass: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'COMPLIANT'] }, 1, 0] } },
+            fail: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'NON_COMPLIANT'] }, 1, 0] } },
             review: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'REVIEW'] }, 1, 0] } },
           }
         },
@@ -142,8 +145,8 @@ export async function getAnalytics(req, res, next) {
           $group: {
             _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
             total: { $sum: 1 },
-            pass: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'PASS'] }, 1, 0] } },
-            fail: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'FAIL'] }, 1, 0] } },
+            pass: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'COMPLIANT'] }, 1, 0] } },
+            fail: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'NON_COMPLIANT'] }, 1, 0] } },
             review: { $sum: { $cond: [{ $eq: ['$complianceStatus', 'REVIEW'] }, 1, 0] } }
           }
         },
@@ -155,8 +158,9 @@ export async function getAnalytics(req, res, next) {
     
     // Normalize compliance distribution array to an object for frontend ease
     const complianceDistribution = { PASS: 0, FAIL: 0, REVIEW: 0, PENDING: 0 };
+    const statusMap = { COMPLIANT: 'PASS', NON_COMPLIANT: 'FAIL' };
     complianceDistResult.forEach(item => {
-      complianceDistribution[item._id] = item.count;
+      complianceDistribution[statusMap[item._id] || item._id] = item.count;
     });
 
     return res.status(200).json({

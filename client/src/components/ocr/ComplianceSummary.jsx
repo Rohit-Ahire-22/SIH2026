@@ -14,8 +14,10 @@ function ComplianceSummary({ categoryData = {} }) {
 
   const getStatusDisplay = () => {
     switch(status) {
+      case 'COMPLIANT':
       case 'PASS':
         return { color: 'text-green-700 bg-green-50 border-green-200', icon: CheckCircle, label: 'COMPLIANT' };
+      case 'NON_COMPLIANT':
       case 'FAIL':
         return { color: 'text-red-700 bg-red-50 border-red-200', icon: AlertTriangle, label: 'NON-COMPLIANT' };
       case 'REVIEW':

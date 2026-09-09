@@ -69,8 +69,8 @@ function ComplianceResultPage() {
   if (!productData) return null;
 
   const { complianceStatus, complianceDetails, analysisStatus, category, ocrResults, images } = productData;
-  const isPass = complianceStatus === 'PASS';
-  const isFail = complianceStatus === 'FAIL';
+  const isPass = complianceStatus === 'COMPLIANT' || complianceStatus === 'PASS';
+  const isFail = complianceStatus === 'NON_COMPLIANT' || complianceStatus === 'FAIL';
   const isReview = complianceStatus === 'REVIEW';
 
   const imageUrl = images && images.length > 0 ? images[images.length - 1].url : null;

@@ -85,7 +85,9 @@ function InspectionHistoryPage() {
 
   const getStatusIcon = (status) => {
     switch (status) {
+      case 'COMPLIANT':
       case 'PASS': return <CheckCircle className="text-green-500" size={16} />;
+      case 'NON_COMPLIANT':
       case 'FAIL': return <XCircle className="text-red-500" size={16} />;
       case 'REVIEW': return <AlertCircle className="text-amber-500" size={16} />;
       default: return <Clock className="text-gray-400" size={16} />;
@@ -94,7 +96,9 @@ function InspectionHistoryPage() {
 
   const getStatusColor = (status) => {
     switch (status) {
+      case 'COMPLIANT':
       case 'PASS': return 'bg-green-100 text-green-800 border-green-200';
+      case 'NON_COMPLIANT':
       case 'FAIL': return 'bg-red-100 text-red-800 border-red-200';
       case 'REVIEW': return 'bg-amber-100 text-amber-800 border-amber-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
@@ -136,8 +140,8 @@ function InspectionHistoryPage() {
                 className="appearance-none pl-10 pr-8 py-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
               >
                 <option value="">All Statuses</option>
-                <option value="PASS">Compliant (PASS)</option>
-                <option value="FAIL">Non-Compliant (FAIL)</option>
+                <option value="COMPLIANT">Compliant (COMPLIANT)</option>
+                <option value="NON_COMPLIANT">Non-Compliant (NON_COMPLIANT)</option>
                 <option value="REVIEW">Review Required</option>
                 <option value="PENDING">Pending</option>
               </select>
