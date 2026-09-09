@@ -45,6 +45,8 @@ import {
   RULE_9_CLAUSE_COUNT,
   RULE_9_KEYS,
 } from '../rules/lmpcRule9Clauses.js'
+import { rule7ThresholdResolver } from '../rules/rule7ThresholdRegistry.js'
+import { TRUSTED_CALIBRATION_SOURCES } from '../../services/measurementEvidenceService.js'
 
 const { PASS, FAIL, REVIEW, NOT_APPLICABLE, PENDING } = COMPLIANCE_STATUS
 
@@ -92,10 +94,7 @@ function evaluateGeneric(clause, product, context, requirementType) {
   if (hasValue(evidence)) {
     return { status: PASS, evidence: [{ field: clause.key, value: safeString(evidence), source: 'explicit' }], reason: `${clause.key} explicit evidence confirms compliance.` }
   }
-  
-  if (requirementType === 'measurement') {
-    return { status: REVIEW, evidence: [], reason: `${clause.key} requires physical measurement/calibration. OCR bounding boxes or OCR text do not prove compliance.` }
-  } else if (requirementType === 'visual_panel') {
+  if (requirementType === 'visual_panel') {
     return { status: REVIEW, evidence: [], reason: `${clause.key} requires visual/panel determination. CV evidence is not implemented yet.` }
   } else if (requirementType === 'visual_legibility') {
     return { status: REVIEW, evidence: [], reason: `${clause.key} requires visual assessment. OCR text detection and high OCR confidence do NOT prove legal legibility.` }
@@ -103,6 +102,115 @@ function evaluateGeneric(clause, product, context, requirementType) {
     return { status: REVIEW, evidence: [], reason: `${clause.key} medical-device-specific evidence/threshold information is unavailable.` }
   }
   return { status: REVIEW, evidence: [], reason: `Insufficient evidence for ${clause.key}.` }
+}
+
+// A calibration is legally trusted ONLY when its source is explicitly accepted
+// by the server-side allowlist. The calibrationTrust field is informational;
+// the authority decision is made here against server-controlled data so a
+// caller can never manufacture trust by setting a boolean or a string.
+function isTrustedCalibration(measurementEvidence) {
+  if (!measurementEvidence || !measurementEvidence.calibration) return false
+  return TRUSTED_CALIBRATION_SOURCES.has(measurementEvidence.calibration.source)
+}
+
+function evaluateMeasurement(clause, product, context, measurementEvidence) {
+  if (isConfirmedAbsent(clause.key, context)) {
+    return { status: FAIL, evidence: absentEvidenceMarker(clause), reason: `${clause.key} confirmed absent by explicit inspection.` }
+  }
+
+  // Explicit trusted evidence on the product takes precedence over the
+  // measurement path (consistent with every other clause).
+  const explicitEvidence = readProductField(product, clause.key)
+  if (hasValue(explicitEvidence)) {
+    return { status: PASS, evidence: [{ field: clause.key, value: safeString(explicitEvidence), source: 'explicit' }], reason: `${clause.key} explicit evidence confirms compliance.` }
+  }
+
+  if (!measurementEvidence || measurementEvidence.measurementStatus === 'UNAVAILABLE') {
+    return { status: REVIEW, evidence: [], reason: `${clause.key} requires physical measurement. No measurement evidence found.` }
+  }
+
+  if (measurementEvidence.measurementStatus === 'UNCALIBRATED') {
+    // Find if we have pixel evidence to show in reason
+    const ms = measurementEvidence.measurements?.find(m => m.target === clause.key)
+    if (ms) {
+      return { 
+        status: REVIEW, 
+        evidence: [{ field: clause.key, value: `${ms.pixelHeight} px`, source: 'measurement' }], 
+        reason: `${clause.key} measured at ${ms.pixelHeight} px. No legitimate physical calibration available. Pixels cannot safely be interpreted as millimetres.` 
+      }
+    }
+    return { status: REVIEW, evidence: [], reason: `${clause.key} requires physical measurement/calibration. Image is uncalibrated.` }
+  }
+
+  if (measurementEvidence.measurementStatus === 'UNCERTAIN') {
+    return { status: REVIEW, evidence: [], reason: `${clause.key} measurement is UNCERTAIN (e.g. malformed calibration, perspective distortion, or unreliable uncertainty). Cannot safely evaluate. Manual review required.` }
+  }
+
+  if (measurementEvidence.measurementStatus === 'CALIBRATED') {
+    const ms = measurementEvidence.measurements?.find(m => m.target === clause.key)
+    if (!ms || ms.physicalHeight == null) {
+      return { status: REVIEW, evidence: [], reason: `${clause.key} was not successfully measured despite valid calibration.` }
+    }
+
+    if (ms.status === 'UNCERTAIN') {
+      const valueLabel = ms.physicalHeight == null ? 'n/a' : `${ms.physicalHeight.toFixed(2)} ${ms.unit} ± ${ms.uncertainty.toFixed(2)}`
+      return {
+        status: REVIEW,
+        evidence: [{ field: clause.key, value: `${ms.pixelHeight} px`, source: 'measurement' }],
+        reason: `${clause.key} physical measurement is unreliable (${valueLabel}). Cannot safely evaluate. Manual review required.`,
+      }
+    }
+
+    // Trust boundary #1: the calibration source must be accepted by the
+    // trusted architecture. Untrusted calibration can never produce PASS/FAIL.
+    if (!isTrustedCalibration(measurementEvidence)) {
+      return {
+        status: REVIEW,
+        evidence: [{ field: clause.key, value: `${ms.physicalHeight.toFixed(2)} ${ms.unit}`, source: 'measurement', bbox: ms.bbox }],
+        reason: `Physical measurement is available (${ms.physicalHeight.toFixed(2)} ${ms.unit} ± ${ms.uncertainty.toFixed(2)}), but the calibration source is not trusted by the compliance architecture (calibrationTrust: ${measurementEvidence.calibrationTrust ?? 'UNKNOWN'}). Manual review required.`,
+      }
+    }
+
+    // Trust boundary #2: a verified legal threshold must come from the trusted
+    // legal registry ONLY. Caller-supplied context.thresholds is never used for
+    // definitive PASS/FAIL.
+    const threshold = rule7ThresholdResolver.getVerifiedRule7Threshold(clause.ruleId)
+    if (threshold === undefined || threshold === null) {
+      return {
+        status: REVIEW,
+        evidence: [{ field: clause.key, value: `${ms.physicalHeight.toFixed(2)} ${ms.unit}`, source: 'measurement', bbox: ms.bbox }],
+        reason: 'Physical measurement is available, but no verified legal Rule 7 threshold is currently encoded in the trusted legal registry.',
+      }
+    }
+
+    // Uncertainty-aware deterministic comparison: the whole measurement band
+    // must be above (PASS) or below (FAIL) the verified threshold.
+    const uncertainty = ms.uncertainty || 0
+    const low = ms.physicalHeight - uncertainty
+    const high = ms.physicalHeight + uncertainty
+    const measuredLabel = `${ms.physicalHeight.toFixed(2)} ${ms.unit} ± ${uncertainty.toFixed(2)}`
+    if (low >= threshold) {
+      return {
+        status: PASS,
+        evidence: [{ field: clause.key, value: `${ms.physicalHeight.toFixed(2)} ${ms.unit}`, source: 'measurement', bbox: ms.bbox }],
+        reason: `Measured height: ${measuredLabel}. Meets required threshold of ${threshold} ${ms.unit}.`,
+      }
+    }
+    if (high < threshold) {
+      return {
+        status: FAIL,
+        evidence: [{ field: clause.key, value: `${ms.physicalHeight.toFixed(2)} ${ms.unit}`, source: 'measurement', bbox: ms.bbox }],
+        reason: `Measured height: ${measuredLabel}. Fails required threshold of ${threshold} ${ms.unit}.`,
+      }
+    }
+    return {
+      status: REVIEW,
+      evidence: [{ field: clause.key, value: `${ms.physicalHeight.toFixed(2)} ${ms.unit}`, source: 'measurement', bbox: ms.bbox }],
+      reason: `Measured height: ${measuredLabel} straddles the verified threshold of ${threshold} ${ms.unit}; the uncertainty band prevents a reliable legal determination. Manual review required.`,
+    }
+  }
+
+  return { status: REVIEW, evidence: [], reason: `Insufficient measurement evidence for ${clause.key}.` }
 }
 
 // --- Helper: Check if any clause in a set has a given key ---
@@ -113,24 +221,24 @@ function findClauseByKey(clauses, key) {
 
 // --- Rule 7 Evaluators ---
 
-function numeralLetterHeightEvaluation(clause, product, context) {
-  return evaluateGeneric(clause, product, context, 'measurement')
+function numeralLetterHeightEvaluation(clause, product, context, measurementEvidence) {
+  return evaluateMeasurement(clause, product, context, measurementEvidence)
 }
 
-function smallPackageEvaluation(clause, product, context) {
-  return evaluateGeneric(clause, product, context, 'measurement')
+function smallPackageEvaluation(clause, product, context, measurementEvidence) {
+  return evaluateMeasurement(clause, product, context, measurementEvidence)
 }
 
-function letterHeightEvaluation(clause, product, context) {
-  return evaluateGeneric(clause, product, context, 'measurement')
+function letterHeightEvaluation(clause, product, context, measurementEvidence) {
+  return evaluateMeasurement(clause, product, context, measurementEvidence)
 }
 
-function letterWidthRatioEvaluation(clause, product, context) {
-  return evaluateGeneric(clause, product, context, 'measurement')
+function letterWidthRatioEvaluation(clause, product, context, measurementEvidence) {
+  return evaluateMeasurement(clause, product, context, measurementEvidence)
 }
 
-function quantityTypeDependentSizeEvaluation(clause, product, context) {
-  return evaluateGeneric(clause, product, context, 'measurement')
+function quantityTypeDependentSizeEvaluation(clause, product, context, measurementEvidence) {
+  return evaluateMeasurement(clause, product, context, measurementEvidence)
 }
 
 function medicalDeviceOverrideEvaluation(clause, product, context) {
@@ -281,6 +389,7 @@ export function evaluateRules789({
   context = {},
   evidence = {},
   fusedEvidence = null,
+  measurementEvidence = null,
   asOfDate,
 }) {
   const day = normalizeDate(asOfDate)
@@ -349,19 +458,19 @@ export function evaluateRules789({
     let outcome
     switch (clause.key) {
       case 'numeralLetterHeight':
-        outcome = numeralLetterHeightEvaluation(clause, product, context)
+        outcome = numeralLetterHeightEvaluation(clause, product, context, measurementEvidence)
         break
       case 'smallPackage':
-        outcome = smallPackageEvaluation(clause, product, context)
+        outcome = smallPackageEvaluation(clause, product, context, measurementEvidence)
         break
       case 'letterHeight':
-        outcome = letterHeightEvaluation(clause, product, context)
+        outcome = letterHeightEvaluation(clause, product, context, measurementEvidence)
         break
       case 'letterWidthRatio':
-        outcome = letterWidthRatioEvaluation(clause, product, context)
+        outcome = letterWidthRatioEvaluation(clause, product, context, measurementEvidence)
         break
       case 'quantityTypeDependentSize':
-        outcome = quantityTypeDependentSizeEvaluation(clause, product, context)
+        outcome = quantityTypeDependentSizeEvaluation(clause, product, context, measurementEvidence)
         break
       case 'medicalDeviceOverride':
         outcome = medicalDeviceOverrideEvaluation(clause, product, context)

@@ -6,6 +6,7 @@ import { evaluateRules789 } from '../legal/compliance/rule789ComplianceService.j
 import { evaluateRule11 } from '../legal/compliance/rule11ComplianceService.js'
 import { VisualDetectionClient } from './visualDetectionClient.js'
 import { EvidenceFusionService } from './evidenceFusionService.js'
+import { MeasurementEvidenceService } from './measurementEvidenceService.js'
 import Product from '../models/Product.js'
 
 function getOverallComplianceStatus(statuses) {
@@ -98,6 +99,24 @@ export class AnalysisOrchestrationService {
         // Degrade gracefully
       }
 
+      // 2c. Measurement Evidence
+      const legalContext = {
+        consumerType: 'RETAIL',
+        packageType: 'PRE_PACKAGED',
+        importStatus: 'DOMESTIC',
+        quantityValue: product.netQuantity?.value,
+        quantityUnit: product.netQuantity?.unit,
+        asOfDate: new Date()
+      }
+      let measurementEvidence = null
+      try {
+        measurementEvidence = MeasurementEvidenceService.extractMeasurementEvidence(extracted, ocrDetections, legalContext)
+        if (!product.metadata) product.metadata = {}
+        product.metadata.measurementEvidence = measurementEvidence
+      } catch (measureErr) {
+        console.error("Measurement Extraction Failed:", measureErr)
+      }
+
       // 3. Category Detection
       const categoryContext = {
         productName: product.productName,
@@ -116,18 +135,10 @@ export class AnalysisOrchestrationService {
 
       // 4. Legal Metrology Applicability & Rule Evaluation
       // Default to assuming RETAIL consumer type unless overridden by user manually
-      const legalContext = {
-        consumerType: 'RETAIL',
-        packageType: 'PRE_PACKAGED',
-        importStatus: 'DOMESTIC',
-        domain: categoryResult.category, // Do not default unknown to 'food'
-        quantityValue: product.netQuantity?.value,
-        quantityUnit: product.netQuantity?.unit,
-        asOfDate: new Date()
-      }
+      legalContext.domain = categoryResult.category // Do not default unknown to 'food'
 
       const r6 = evaluateRule6({ product: product.toObject(), context: legalContext, asOfDate: new Date() })
-      const r789 = evaluateRules789({ product: product.toObject(), context: legalContext, fusedEvidence, asOfDate: new Date() })
+      const r789 = evaluateRules789({ product: product.toObject(), context: legalContext, fusedEvidence, measurementEvidence, asOfDate: new Date() })
       const r11 = await evaluateRule11(product.toObject(), legalContext, new Date())
 
       const overallStatus = getOverallComplianceStatus([r6.status, r789.status, r11.status])
