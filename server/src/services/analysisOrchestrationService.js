@@ -9,14 +9,20 @@ import { EvidenceFusionService } from './evidenceFusionService.js'
 import { MeasurementEvidenceService } from './measurementEvidenceService.js'
 import Product from '../models/Product.js'
 
-function getOverallComplianceStatus(statuses) {
+export function getOverallComplianceStatus(statuses) {
+  if (!statuses || statuses.length === 0) return 'REVIEW'
   if (statuses.includes('FAIL')) return 'NON_COMPLIANT'
-  if (statuses.includes('REVIEW') || statuses.includes('PENDING')) return 'REVIEW'
   
-  const applicableStatuses = statuses.filter(s => s === 'PASS' || s === 'FAIL')
-  if (applicableStatuses.length === 0) return 'REVIEW' // No confidently applicable rules
+  // Any status that is not PASS or NOT_APPLICABLE should trigger REVIEW
+  const invalidOrUncertain = statuses.filter(s => s !== 'PASS' && s !== 'NOT_APPLICABLE')
+  if (invalidOrUncertain.length > 0) return 'REVIEW'
 
-  return 'COMPLIANT'
+  // Now we only have PASS or NOT_APPLICABLE
+  const passedCount = statuses.filter(s => s === 'PASS').length
+  if (passedCount > 0) return 'COMPLIANT'
+  
+  // All rules are NOT_APPLICABLE
+  return 'REVIEW'
 }
 
 export class AnalysisOrchestrationService {

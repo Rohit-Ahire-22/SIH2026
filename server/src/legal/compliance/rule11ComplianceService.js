@@ -65,8 +65,8 @@ export async function evaluateRule11(product, context, asOfDate = new Date()) {
   }
 
   function statusRank(status) {
-    const order = { [FAIL]: 1, [REVIEW]: 2, [PASS]: 3, [NOT_APPLICABLE]: 4, [PENDING]: 5 }
-    return order[status] ?? 5
+    const order = { [FAIL]: 1, [REVIEW]: 2, [PENDING]: 2, [PASS]: 3, [NOT_APPLICABLE]: 4 }
+    return order[status] ?? 2
   }
 
   function worstStatus(statuses) {
