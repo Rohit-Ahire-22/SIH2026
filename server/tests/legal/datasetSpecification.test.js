@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 describe('Dataset Specification Validation', () => {
-  const schemaPath = path.resolve(process.cwd(), '../docs/dataset/schema.json')
+  const schemaPath = path.resolve(process.cwd(), 'docs/dataset/schema.json')
   let schema = null
 
   test('1. JSON schema file exists and is valid JSON', () => {

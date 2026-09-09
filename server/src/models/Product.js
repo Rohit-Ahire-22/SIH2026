@@ -3,8 +3,8 @@ import mongoose from 'mongoose'
 const { Schema } = mongoose
 
 export const COMPLIANCE_STATUS = Object.freeze({
-  PASS: 'PASS',
-  FAIL: 'FAIL',
+  COMPLIANT: 'COMPLIANT',
+  NON_COMPLIANT: 'NON_COMPLIANT',
   REVIEW: 'REVIEW',
   PENDING: 'PENDING',
 })

@@ -32,21 +32,21 @@ def validate_dataset(manifest_path, master_annotations_path):
     
     if not os.path.exists(manifest_path):
         reasons.append("DATASET_VERSION_NOT_FOUND")
-        return reasons
+        return reasons, None, None
         
     try:
         with open(manifest_path, 'r') as f:
             manifest = json.load(f)
     except Exception:
         reasons.append("DATASET_VERSION_NOT_FOUND")
-        return reasons
+        return reasons, None, None
 
     try:
         with open(master_annotations_path, 'r') as f:
             annotations = json.load(f)
     except Exception:
         reasons.append("MISSING_LABELS")
-        return reasons
+        return reasons, manifest, None
 
     images = manifest.get('images', [])
     product_splits = manifest.get('productSplits', {})
