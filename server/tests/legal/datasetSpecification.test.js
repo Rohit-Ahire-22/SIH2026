@@ -1,10 +1,11 @@
 import { test, describe } from 'node:test'
 import assert from 'node:assert'
 import fs from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
 describe('Dataset Specification Validation', () => {
-  const schemaPath = path.resolve(process.cwd(), 'docs/dataset/schema.json')
+  const schemaPath = path.resolve(fileURLToPath(import.meta.url), '../../../../docs/dataset/schema.json')
   let schema = null
 
   test('1. JSON schema file exists and is valid JSON', () => {
