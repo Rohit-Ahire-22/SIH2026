@@ -45,6 +45,7 @@ import {
   RULE_9_CLAUSE_COUNT,
   RULE_9_KEYS,
 } from '../rules/lmpcRule9Clauses.js'
+import { MANDATORY_DECLARATION_IDENTIFIERS } from '../rules/lmpcRules.js'
 import { rule7ThresholdResolver } from '../rules/rule7ThresholdRegistry.js'
 import { TRUSTED_CALIBRATION_SOURCES } from '../../services/measurementEvidenceService.js'
 
@@ -268,87 +269,116 @@ function pdpLocationEvaluation(clause, product, context, fusedEvidence) {
     }
   }
 
-  if (fusedEvidence.pdpDetected) {
-    return {
-      status: PASS,
-      evidence: [{ field: 'pdp', value: 'Detected', source: 'visual', bbox: fusedEvidence.pdpBbox }],
-      reason: 'Principal Display Panel confidently detected by visual model.'
-    }
-  }
-
-  return {
-    status: REVIEW,
-    evidence: [],
-    reason: 'PDP not detected by visual model.'
-  }
-}
-
-function declarationPlacementEvaluation(clause, product, context, fusedEvidence) {
-  if (!fusedEvidence || !fusedEvidence.visualInferenceStatus) {
-    return evaluateGeneric(clause, product, context, 'visual_panel')
-  }
-
-  if (fusedEvidence.visualInferenceStatus === 'UNAVAILABLE_MODEL_MISSING' || fusedEvidence.visualInferenceStatus !== 'SUCCESS') {
-    return {
-      status: REVIEW,
-      evidence: [],
-      reason: `Declaration placement on PDP requires visual model. Current status: ${fusedEvidence.visualInferenceStatus}. Safe fallback to REVIEW.`
-    }
-  }
-
   if (!fusedEvidence.pdpDetected) {
     return {
       status: REVIEW,
       evidence: [],
-      reason: 'PDP not detected; cannot verify declaration placement.'
+      reason: 'PDP not detected by visual model.'
     }
   }
 
-  // Check if mandatory declarations are INSIDE the PDP
+  if (fusedEvidence.pdpConfidence < 0.6) { // Arbitrary conservative threshold for low-confidence PDP
+    return {
+      status: REVIEW,
+      evidence: [{ field: 'pdp', value: 'Detected', source: 'visual', bbox: fusedEvidence.pdpBbox, confidence: fusedEvidence.pdpConfidence }],
+      reason: `PDP detected but confidence (${fusedEvidence.pdpConfidence}) is too low to safely evaluate.`
+    }
+  }
+
   const fieldsInside = []
   const fieldsPartial = []
   const fieldsOutside = []
+  const fieldsUnknown = []
+  const lowConfidenceFields = []
+
+  let hasRequiredDeclarations = false
 
   if (fusedEvidence.fusedFields) {
     for (const [key, data] of Object.entries(fusedEvidence.fusedFields)) {
-      if (data.spatialRelationToPdp === 'INSIDE') {
-        fieldsInside.push(key)
-      } else if (data.spatialRelationToPdp === 'PARTIAL') {
-        fieldsPartial.push(key)
-      } else if (data.spatialRelationToPdp === 'OUTSIDE') {
-        fieldsOutside.push(key)
+      // Only declarations that belong to the mandatory declaration identifiers
+      // of the legal/compliance architecture (Rule 6) are relevant to this
+      // Rule 8 pdpLocation clause. Unrelated, promotional, or ambient OCR text
+      // must not determine the pdpLocation outcome.
+      if (!MANDATORY_DECLARATION_IDENTIFIERS.includes(key)) continue
+      if (data.value && data.value !== 'REVIEW') {
+        hasRequiredDeclarations = true
+        if (data.confidence !== undefined && data.confidence < 0.8) {
+          lowConfidenceFields.push(key)
+        }
+        if (data.spatialRelationToPdp === 'INSIDE') {
+          fieldsInside.push(key)
+        } else if (data.spatialRelationToPdp === 'PARTIAL') {
+          fieldsPartial.push(key)
+        } else if (data.spatialRelationToPdp === 'OUTSIDE') {
+          fieldsOutside.push(key)
+        } else {
+          fieldsUnknown.push(key)
+        }
       }
     }
   }
 
-  if (fieldsPartial.length > 0) {
+  if (!hasRequiredDeclarations) {
     return {
       status: REVIEW,
-      evidence: [{ field: 'placement', value: 'Partial', source: 'fusion', fields: fieldsPartial }],
-      reason: `Visual evidence shows some mandatory declarations (${fieldsPartial.join(', ')}) partially intersect the PDP boundary. Requires manual review.`
+      evidence: [{ field: 'pdp', value: 'Detected', source: 'visual', bbox: fusedEvidence.pdpBbox }],
+      reason: 'PDP confidently detected, but no OCR declarations found to verify spatial relationship.'
     }
   }
 
-  if (fieldsInside.length > 0) {
+  if (lowConfidenceFields.length > 0) {
     return {
-      status: PASS,
-      evidence: [{ field: 'placement', value: 'Inside PDP', source: 'fusion', fields: fieldsInside }],
-      reason: `Visual evidence confirms declarations (${fieldsInside.join(', ')}) are wholly located on the PDP.`
+      status: REVIEW,
+      evidence: [{ field: 'pdp', value: 'Detected', source: 'visual', bbox: fusedEvidence.pdpBbox }],
+      reason: `PDP detected, but OCR declarations (${lowConfidenceFields.join(', ')}) have low confidence. Cannot safely evaluate.`
     }
   }
 
   if (fieldsOutside.length > 0) {
     return {
       status: REVIEW,
-      evidence: [{ field: 'placement', value: 'Outside PDP', source: 'fusion', fields: fieldsOutside }],
-      reason: `Visual evidence shows declarations (${fieldsOutside.join(', ')}) are outside the PDP. Verify if they are required to be on the PDP.`
+      evidence: [{ field: 'pdp', value: 'Detected', source: 'visual', bbox: fusedEvidence.pdpBbox }],
+      reason: `PDP detected, but declarations (${fieldsOutside.join(', ')}) are OUTSIDE. Verify if they are legally required to be inside.`
+    }
+  }
+
+  if (fieldsPartial.length > 0) {
+    return {
+      status: REVIEW,
+      evidence: [{ field: 'pdp', value: 'Detected', source: 'visual', bbox: fusedEvidence.pdpBbox }],
+      reason: `PDP detected, but declarations (${fieldsPartial.join(', ')}) are PARTIAL. Cannot safely evaluate.`
+    }
+  }
+
+  if (fieldsUnknown.length > 0) {
+    return {
+      status: REVIEW,
+      evidence: [{ field: 'pdp', value: 'Detected', source: 'visual', bbox: fusedEvidence.pdpBbox }],
+      reason: `PDP detected, but declarations (${fieldsUnknown.join(', ')}) have an UNKNOWN spatial relationship to the PDP. Cannot safely evaluate.`
+    }
+  }
+
+  if (fieldsInside.length > 0) {
+    return {
+      status: PASS,
+      evidence: [{ field: 'pdp', value: 'Detected', source: 'visual', bbox: fusedEvidence.pdpBbox }, { field: 'placement', value: 'Inside PDP', source: 'fusion', fields: fieldsInside }],
+      reason: `PDP confidently detected and all extracted mandatory declarations (${fieldsInside.join(', ')}) are confidently INSIDE.`
     }
   }
 
   return {
     status: REVIEW,
     evidence: [],
-    reason: 'PDP detected, but no mandatory declarations found with known spatial relationship to it.'
+    reason: 'PDP detected, but spatial relationship of declarations is UNKNOWN or ambiguous.'
+  }
+}
+
+function declarationPlacementEvaluation(clause, product, context, fusedEvidence) {
+  // Current visual model only detects PDP boundaries, not obstruction/readability
+  return {
+    status: REVIEW,
+    evidence: [],
+    reason: 'Visual model does not reliably detect obstruction, graphics covering declarations, or readability. Manual review required.'
   }
 }
 

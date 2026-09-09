@@ -10,105 +10,210 @@ describe('Rule 8 Visual Integration', () => {
     importStatus: 'DOMESTIC'
   }
 
-  it('returns REVIEW for pdpLocation when visual model is missing', () => {
+  function getRule8Check(result, ruleKey) {
+    return result.checks.find(c => c.ruleId === `LMPC-RULE8-${ruleKey}`)
+  }
+
+  // 1. PDP confidently detected + declaration fully inside
+  it('PDP confidently detected + declaration fully inside -> PASS for pdpLocation', () => {
     const fusedEvidence = {
-      visualInferenceStatus: 'UNAVAILABLE_MODEL_MISSING',
+      visualInferenceStatus: 'SUCCESS',
+      pdpDetected: true,
+      pdpConfidence: 0.9,
+      pdpBbox: [0, 0, 100, 100],
+      fusedFields: {
+        mrp: { value: '100', confidence: 0.9, spatialRelationToPdp: 'INSIDE' }
+      }
+    }
+
+    const result = evaluateRules789({ product: {}, context: baseContext, fusedEvidence, asOfDate: new Date('2026-01-01') })
+    const check = getRule8Check(result, 'pdpLocation')
+    assert.strictEqual(check.status, COMPLIANCE_STATUS.PASS)
+    assert.ok(check.reason.includes('all extracted mandatory declarations (mrp) are confidently INSIDE'))
+  })
+
+  // 2. PDP confidently detected + declaration partially intersecting
+  it('PDP confidently detected + declaration PARTIAL -> REVIEW for pdpLocation', () => {
+    const fusedEvidence = {
+      visualInferenceStatus: 'SUCCESS',
+      pdpDetected: true,
+      pdpConfidence: 0.9,
+      pdpBbox: [0, 0, 100, 100],
+      fusedFields: {
+        mrp: { value: '100', confidence: 0.9, spatialRelationToPdp: 'PARTIAL' }
+      }
+    }
+
+    const result = evaluateRules789({ product: {}, context: baseContext, fusedEvidence, asOfDate: new Date('2026-01-01') })
+    const check = getRule8Check(result, 'pdpLocation')
+    assert.strictEqual(check.status, COMPLIANCE_STATUS.REVIEW)
+    assert.ok(check.reason.includes('PARTIAL'))
+  })
+
+  // 3. PDP confidently detected + declaration outside
+  it('PDP confidently detected + declaration OUTSIDE -> REVIEW for pdpLocation', () => {
+    const fusedEvidence = {
+      visualInferenceStatus: 'SUCCESS',
+      pdpDetected: true,
+      pdpConfidence: 0.9,
+      pdpBbox: [0, 0, 100, 100],
+      fusedFields: {
+        mrp: { value: '100', confidence: 0.9, spatialRelationToPdp: 'OUTSIDE' }
+      }
+    }
+
+    const result = evaluateRules789({ product: {}, context: baseContext, fusedEvidence, asOfDate: new Date('2026-01-01') })
+    const check = getRule8Check(result, 'pdpLocation')
+    assert.strictEqual(check.status, COMPLIANCE_STATUS.REVIEW)
+    assert.ok(check.reason.includes('OUTSIDE'))
+  })
+
+  // 4. Missing PDP detection
+  it('Missing PDP detection -> REVIEW for pdpLocation', () => {
+    const fusedEvidence = {
+      visualInferenceStatus: 'SUCCESS',
       pdpDetected: false
     }
 
-    const result = evaluateRules789({
-      product: {},
-      context: baseContext,
-      fusedEvidence,
-      asOfDate: new Date('2026-01-01')
-    })
-
-    const pdpCheck = result.checks.find(c => c.ruleId === 'LMPC-RULE8-pdpLocation')
-    assert.strictEqual(pdpCheck.status, COMPLIANCE_STATUS.REVIEW)
-    assert.ok(pdpCheck.reason.includes('Safe fallback to REVIEW'))
+    const result = evaluateRules789({ product: {}, context: baseContext, fusedEvidence, asOfDate: new Date('2026-01-01') })
+    const check = getRule8Check(result, 'pdpLocation')
+    assert.strictEqual(check.status, COMPLIANCE_STATUS.REVIEW)
+    assert.ok(check.reason.includes('PDP not detected'))
   })
 
-  it('returns PASS for pdpLocation when PDP is confidently detected', () => {
+  // 5. Low-confidence PDP
+  it('Low-confidence PDP -> REVIEW for pdpLocation', () => {
     const fusedEvidence = {
       visualInferenceStatus: 'SUCCESS',
       pdpDetected: true,
-      pdpBbox: [[0,0], [10,0], [10,10], [0,10]]
-    }
-
-    const result = evaluateRules789({
-      product: {},
-      context: baseContext,
-      fusedEvidence,
-      asOfDate: new Date('2026-01-01')
-    })
-
-    const pdpCheck = result.checks.find(c => c.ruleId === 'LMPC-RULE8-pdpLocation')
-    assert.strictEqual(pdpCheck.status, COMPLIANCE_STATUS.PASS)
-  })
-
-  it('returns PASS for declarationPlacement when declarations are INSIDE PDP', () => {
-    const fusedEvidence = {
-      visualInferenceStatus: 'SUCCESS',
-      pdpDetected: true,
-      pdpBbox: [[0,0], [100,0], [100,100], [0,100]],
+      pdpConfidence: 0.4,
       fusedFields: {
-        mrp: { value: '100', spatialRelationToPdp: 'INSIDE' }
+        mrp: { value: '100', confidence: 0.9, spatialRelationToPdp: 'INSIDE' }
       }
     }
 
-    const result = evaluateRules789({
-      product: {},
-      context: baseContext,
-      fusedEvidence,
-      asOfDate: new Date('2026-01-01')
-    })
-
-    const placementCheck = result.checks.find(c => c.ruleId === 'LMPC-RULE8-declarationPlacement')
-    assert.strictEqual(placementCheck.status, COMPLIANCE_STATUS.PASS)
-    assert.ok(placementCheck.reason.includes('Visual evidence confirms declarations (mrp) are wholly located on the PDP'))
+    const result = evaluateRules789({ product: {}, context: baseContext, fusedEvidence, asOfDate: new Date('2026-01-01') })
+    const check = getRule8Check(result, 'pdpLocation')
+    assert.strictEqual(check.status, COMPLIANCE_STATUS.REVIEW)
+    assert.ok(check.reason.includes('confidence'))
   })
 
-  it('returns REVIEW for declarationPlacement when declarations are PARTIAL to PDP', () => {
+  // 6. Missing OCR declaration
+  it('PDP confidently detected but no OCR declarations -> REVIEW for pdpLocation', () => {
     const fusedEvidence = {
       visualInferenceStatus: 'SUCCESS',
       pdpDetected: true,
-      pdpBbox: [[0,0], [100,0], [100,100], [0,100]],
-      fusedFields: {
-        mrp: { value: '100', spatialRelationToPdp: 'PARTIAL' }
-      }
+      pdpConfidence: 0.9,
+      fusedFields: {} // Empty
     }
 
-    const result = evaluateRules789({
-      product: {},
-      context: baseContext,
-      fusedEvidence,
-      asOfDate: new Date('2026-01-01')
-    })
-
-    const placementCheck = result.checks.find(c => c.ruleId === 'LMPC-RULE8-declarationPlacement')
-    assert.strictEqual(placementCheck.status, COMPLIANCE_STATUS.REVIEW)
-    assert.ok(placementCheck.reason.includes('partially intersect the PDP boundary'))
+    const result = evaluateRules789({ product: {}, context: baseContext, fusedEvidence, asOfDate: new Date('2026-01-01') })
+    const check = getRule8Check(result, 'pdpLocation')
+    assert.strictEqual(check.status, COMPLIANCE_STATUS.REVIEW)
+    assert.ok(check.reason.includes('no OCR declarations found'))
   })
 
-  it('returns REVIEW for declarationPlacement when declarations are OUTSIDE PDP', () => {
+  // 7. Low-confidence OCR declaration
+  it('PDP confidently detected + declaration INSIDE but low OCR confidence -> REVIEW for pdpLocation', () => {
     const fusedEvidence = {
       visualInferenceStatus: 'SUCCESS',
       pdpDetected: true,
-      pdpBbox: [[0,0], [100,0], [100,100], [0,100]],
+      pdpConfidence: 0.9,
       fusedFields: {
-        mrp: { value: '100', spatialRelationToPdp: 'OUTSIDE' }
+        mrp: { value: '100', confidence: 0.5, spatialRelationToPdp: 'INSIDE' }
       }
     }
 
-    const result = evaluateRules789({
-      product: {},
-      context: baseContext,
-      fusedEvidence,
-      asOfDate: new Date('2026-01-01')
-    })
+    const result = evaluateRules789({ product: {}, context: baseContext, fusedEvidence, asOfDate: new Date('2026-01-01') })
+    const check = getRule8Check(result, 'pdpLocation')
+    assert.strictEqual(check.status, COMPLIANCE_STATUS.REVIEW)
+    assert.ok(check.reason.includes('OCR declarations (mrp) have low confidence'))
+  })
 
-    const placementCheck = result.checks.find(c => c.ruleId === 'LMPC-RULE8-declarationPlacement')
-    assert.strictEqual(placementCheck.status, COMPLIANCE_STATUS.REVIEW)
-    assert.ok(placementCheck.reason.includes('are outside the PDP'))
+  // 8. PDP confidently detected + Declaration A = INSIDE, Declaration B = OUTSIDE
+  it('Dangerous case: Declaration A inside, Declaration B outside -> REVIEW', () => {
+    const fusedEvidence = {
+      visualInferenceStatus: 'SUCCESS',
+      pdpDetected: true,
+      pdpConfidence: 0.9,
+      fusedFields: {
+        mrp: { value: '100', confidence: 0.9, spatialRelationToPdp: 'INSIDE' },
+        netQuantity: { value: '500g', confidence: 0.9, spatialRelationToPdp: 'OUTSIDE' }
+      }
+    }
+
+    const result = evaluateRules789({ product: {}, context: baseContext, fusedEvidence, asOfDate: new Date('2026-01-01') })
+    const check = getRule8Check(result, 'pdpLocation')
+    assert.strictEqual(check.status, COMPLIANCE_STATUS.REVIEW)
+    assert.ok(check.reason.includes('declarations (netQuantity) are OUTSIDE'))
+  })
+
+  // 9. Visual model unavailable -> REVIEW
+  it('Visual model unavailable -> REVIEW', () => {
+    const fusedEvidence = {
+      visualInferenceStatus: 'UNAVAILABLE_MODEL_MISSING'
+    }
+
+    const result = evaluateRules789({ product: {}, context: baseContext, fusedEvidence, asOfDate: new Date('2026-01-01') })
+    const check = getRule8Check(result, 'pdpLocation')
+    assert.strictEqual(check.status, COMPLIANCE_STATUS.REVIEW)
+    assert.ok(check.reason.includes('requires visual model'))
+  })
+
+  // 10. declarationPlacementEvaluation MUST NOT automatically pass
+  it('declarationPlacementEvaluation ALWAYS returns REVIEW because model cannot detect obstruction', () => {
+    const fusedEvidence = {
+      visualInferenceStatus: 'SUCCESS',
+      pdpDetected: true,
+      pdpConfidence: 0.9,
+      fusedFields: {
+        mrp: { value: '100', confidence: 0.9, spatialRelationToPdp: 'INSIDE' }
+      }
+    }
+
+    const result = evaluateRules789({ product: {}, context: baseContext, fusedEvidence, asOfDate: new Date('2026-01-01') })
+    const check = getRule8Check(result, 'declarationPlacement')
+    assert.strictEqual(check.status, COMPLIANCE_STATUS.REVIEW)
+    assert.ok(check.reason.includes('Visual model does not reliably detect obstruction'))
+  })
+
+  // 11. Unrelated/promotional OCR outside the PDP must not force REVIEW
+  it('Unrelated OCR fields OUTSIDE the PDP do NOT force REVIEW when required declarations are INSIDE', () => {
+    const fusedEvidence = {
+      visualInferenceStatus: 'SUCCESS',
+      pdpDetected: true,
+      pdpConfidence: 0.9,
+      pdpBbox: [0, 0, 100, 100],
+      fusedFields: {
+        mrp: { value: '100', confidence: 0.9, spatialRelationToPdp: 'INSIDE' },
+        netQuantity: { value: '500g', confidence: 0.9, spatialRelationToPdp: 'INSIDE' },
+        brandName: { value: 'ExcellentPro Ultra', confidence: 0.95, spatialRelationToPdp: 'OUTSIDE' },
+        productName: { value: 'Magic Clean', confidence: 0.9, spatialRelationToPdp: 'OUTSIDE' }
+      }
+    }
+
+    const result = evaluateRules789({ product: {}, context: baseContext, fusedEvidence, asOfDate: new Date('2026-01-01') })
+    const check = getRule8Check(result, 'pdpLocation')
+    assert.strictEqual(check.status, COMPLIANCE_STATUS.PASS)
+    assert.ok(check.reason.includes('all extracted mandatory declarations (mrp, netQuantity) are confidently INSIDE'))
+  })
+
+  // 12. Required declaration with UNKNOWN spatial relation -> REVIEW (never PASS)
+  it('Required declaration with UNKNOWN spatial relation to PDP -> REVIEW for pdpLocation', () => {
+    const fusedEvidence = {
+      visualInferenceStatus: 'SUCCESS',
+      pdpDetected: true,
+      pdpConfidence: 0.9,
+      pdpBbox: [0, 0, 100, 100],
+      fusedFields: {
+        mrp: { value: '100', confidence: 0.9, spatialRelationToPdp: 'INSIDE' },
+        netQuantity: { value: '500g', confidence: 0.9, spatialRelationToPdp: 'UNKNOWN' }
+      }
+    }
+
+    const result = evaluateRules789({ product: {}, context: baseContext, fusedEvidence, asOfDate: new Date('2026-01-01') })
+    const check = getRule8Check(result, 'pdpLocation')
+    assert.strictEqual(check.status, COMPLIANCE_STATUS.REVIEW)
+    assert.ok(check.reason.includes('netQuantity'))
   })
 })
