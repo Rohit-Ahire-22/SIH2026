@@ -4,6 +4,8 @@ import { detectProductCategory } from './productCategoryService.js'
 import { evaluateRule6 } from '../legal/compliance/rule6ComplianceService.js'
 import { evaluateRules789 } from '../legal/compliance/rule789ComplianceService.js'
 import { evaluateRule11 } from '../legal/compliance/rule11ComplianceService.js'
+import { VisualDetectionClient } from './visualDetectionClient.js'
+import { EvidenceFusionService } from './evidenceFusionService.js'
 import Product from '../models/Product.js'
 
 function getOverallComplianceStatus(statuses) {
@@ -82,6 +84,20 @@ export class AnalysisOrchestrationService {
         if (extracted.productName != null && extracted.productName.value !== 'REVIEW') product.productName = extracted.productName.value
       }
 
+      // 2b. Visual Detection & Fusion
+      let visualResult = null
+      let fusedEvidence = null
+      try {
+        visualResult = await VisualDetectionClient.detectVisualElements(image.url)
+        fusedEvidence = EvidenceFusionService.fuseEvidence(extracted, visualResult, ocrDetections)
+        if (!product.metadata) product.metadata = {}
+        product.metadata.visualEvidence = visualResult
+        product.metadata.fusedEvidence = fusedEvidence
+      } catch (visualErr) {
+        console.error("Visual Detection/Fusion Failed:", visualErr)
+        // Degrade gracefully
+      }
+
       // 3. Category Detection
       const categoryContext = {
         productName: product.productName,
@@ -111,7 +127,7 @@ export class AnalysisOrchestrationService {
       }
 
       const r6 = evaluateRule6({ product: product.toObject(), context: legalContext, asOfDate: new Date() })
-      const r789 = evaluateRules789({ product: product.toObject(), context: legalContext, asOfDate: new Date() })
+      const r789 = evaluateRules789({ product: product.toObject(), context: legalContext, fusedEvidence, asOfDate: new Date() })
       const r11 = await evaluateRule11(product.toObject(), legalContext, new Date())
 
       const overallStatus = getOverallComplianceStatus([r6.status, r789.status, r11.status])

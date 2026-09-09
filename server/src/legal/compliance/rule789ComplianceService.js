@@ -147,12 +147,101 @@ function medicalDeviceOverrideEvaluation(clause, product, context) {
 
 // --- Rule 8 Evaluators ---
 
-function pdpLocationEvaluation(clause, product, context) {
-  return evaluateGeneric(clause, product, context, 'visual_panel')
+function pdpLocationEvaluation(clause, product, context, fusedEvidence) {
+  if (!fusedEvidence || !fusedEvidence.visualInferenceStatus) {
+    return evaluateGeneric(clause, product, context, 'visual_panel')
+  }
+
+  if (fusedEvidence.visualInferenceStatus === 'UNAVAILABLE_MODEL_MISSING' || fusedEvidence.visualInferenceStatus !== 'SUCCESS') {
+    return {
+      status: REVIEW,
+      evidence: [],
+      reason: `PDP detection requires visual model. Current status: ${fusedEvidence.visualInferenceStatus}. Safe fallback to REVIEW.`
+    }
+  }
+
+  if (fusedEvidence.pdpDetected) {
+    return {
+      status: PASS,
+      evidence: [{ field: 'pdp', value: 'Detected', source: 'visual', bbox: fusedEvidence.pdpBbox }],
+      reason: 'Principal Display Panel confidently detected by visual model.'
+    }
+  }
+
+  return {
+    status: REVIEW,
+    evidence: [],
+    reason: 'PDP not detected by visual model.'
+  }
 }
 
-function declarationPlacementEvaluation(clause, product, context) {
-  return evaluateGeneric(clause, product, context, 'visual_panel')
+function declarationPlacementEvaluation(clause, product, context, fusedEvidence) {
+  if (!fusedEvidence || !fusedEvidence.visualInferenceStatus) {
+    return evaluateGeneric(clause, product, context, 'visual_panel')
+  }
+
+  if (fusedEvidence.visualInferenceStatus === 'UNAVAILABLE_MODEL_MISSING' || fusedEvidence.visualInferenceStatus !== 'SUCCESS') {
+    return {
+      status: REVIEW,
+      evidence: [],
+      reason: `Declaration placement on PDP requires visual model. Current status: ${fusedEvidence.visualInferenceStatus}. Safe fallback to REVIEW.`
+    }
+  }
+
+  if (!fusedEvidence.pdpDetected) {
+    return {
+      status: REVIEW,
+      evidence: [],
+      reason: 'PDP not detected; cannot verify declaration placement.'
+    }
+  }
+
+  // Check if mandatory declarations are INSIDE the PDP
+  const fieldsInside = []
+  const fieldsPartial = []
+  const fieldsOutside = []
+
+  if (fusedEvidence.fusedFields) {
+    for (const [key, data] of Object.entries(fusedEvidence.fusedFields)) {
+      if (data.spatialRelationToPdp === 'INSIDE') {
+        fieldsInside.push(key)
+      } else if (data.spatialRelationToPdp === 'PARTIAL') {
+        fieldsPartial.push(key)
+      } else if (data.spatialRelationToPdp === 'OUTSIDE') {
+        fieldsOutside.push(key)
+      }
+    }
+  }
+
+  if (fieldsPartial.length > 0) {
+    return {
+      status: REVIEW,
+      evidence: [{ field: 'placement', value: 'Partial', source: 'fusion', fields: fieldsPartial }],
+      reason: `Visual evidence shows some mandatory declarations (${fieldsPartial.join(', ')}) partially intersect the PDP boundary. Requires manual review.`
+    }
+  }
+
+  if (fieldsInside.length > 0) {
+    return {
+      status: PASS,
+      evidence: [{ field: 'placement', value: 'Inside PDP', source: 'fusion', fields: fieldsInside }],
+      reason: `Visual evidence confirms declarations (${fieldsInside.join(', ')}) are wholly located on the PDP.`
+    }
+  }
+
+  if (fieldsOutside.length > 0) {
+    return {
+      status: REVIEW,
+      evidence: [{ field: 'placement', value: 'Outside PDP', source: 'fusion', fields: fieldsOutside }],
+      reason: `Visual evidence shows declarations (${fieldsOutside.join(', ')}) are outside the PDP. Verify if they are required to be on the PDP.`
+    }
+  }
+
+  return {
+    status: REVIEW,
+    evidence: [],
+    reason: 'PDP detected, but no mandatory declarations found with known spatial relationship to it.'
+  }
 }
 
 function surroundingSpaceEvaluation(clause, product, context) {
@@ -191,6 +280,7 @@ export function evaluateRules789({
   product = {},
   context = {},
   evidence = {},
+  fusedEvidence = null,
   asOfDate,
 }) {
   const day = normalizeDate(asOfDate)
@@ -336,10 +426,10 @@ export function evaluateRules789({
     let outcome
     switch (clause.key) {
       case 'pdpLocation':
-        outcome = pdpLocationEvaluation(clause, product, context)
+        outcome = pdpLocationEvaluation(clause, product, context, fusedEvidence)
         break
       case 'declarationPlacement':
-        outcome = declarationPlacementEvaluation(clause, product, context)
+        outcome = declarationPlacementEvaluation(clause, product, context, fusedEvidence)
         break
       case 'surroundingSpace':
         outcome = surroundingSpaceEvaluation(clause, product, context)

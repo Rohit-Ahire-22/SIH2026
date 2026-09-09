@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, Header, HTTPException, status
 
 from app.routes.ocr import router as ocr_router
+from app.routes.visual import router as visual_router
 from app.services.ocr_service import initialize_ocr
 
 @asynccontextmanager
@@ -46,6 +47,7 @@ def verify_service_key(x_ai_service_key: str = Header(None)):
     logger.info("API-key validation: PASS")
 
 app.include_router(ocr_router, dependencies=[Depends(verify_service_key)])
+app.include_router(visual_router, prefix="/visual", dependencies=[Depends(verify_service_key)])
 
 
 @app.get("/health")
