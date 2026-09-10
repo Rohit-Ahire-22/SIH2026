@@ -11,7 +11,7 @@ export async function generatePdfReport(req, res, next) {
   }
 
   try {
-    const reportDto = await ReportService.getReportDto(id);
+    const reportDto = await ReportService.getReportDto(id, req.user.userId);
     const pdfBuffer = await ReportPdfGenerator.generate(reportDto);
 
     res.setHeader('Content-Type', 'application/pdf');
@@ -38,7 +38,7 @@ export async function generateDocxReport(req, res, next) {
   }
 
   try {
-    const reportDto = await ReportService.getReportDto(id);
+    const reportDto = await ReportService.getReportDto(id, req.user.userId);
     const docxBuffer = await ReportDocxGenerator.generate(reportDto);
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');

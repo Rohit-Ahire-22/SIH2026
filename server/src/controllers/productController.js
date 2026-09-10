@@ -4,7 +4,7 @@ import { uploadProductImageToCloudinary } from '../services/imageUploadService.j
 
 export async function createProduct(req, res, next) {
   try {
-    const product = await Product.create(req.body)
+    const product = await Product.create({ ...req.body, userId: req.user.userId })
     return res.status(201).json({
       success: true,
       message: 'Product created successfully',
@@ -28,7 +28,7 @@ export async function listProducts(req, res, next) {
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20))
     const skip = (page - 1) * limit
     
-    const query = {}
+    const query = { userId: req.user.userId }
     
     // Search
     if (req.query.search) {
@@ -88,7 +88,8 @@ export async function listProducts(req, res, next) {
 export async function getAnalytics(req, res, next) {
   try {
     const { days } = req.query;
-    let matchStage = {};
+    const ownerId = new mongoose.Types.ObjectId(req.user.userId);
+    let matchStage = { userId: ownerId };
 
     if (days && days !== 'all') {
       const parsedDays = parseInt(days, 10);
@@ -97,7 +98,7 @@ export async function getAnalytics(req, res, next) {
       }
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - parsedDays);
-      matchStage = { createdAt: { $gte: cutoffDate } };
+      matchStage = { userId: ownerId, createdAt: { $gte: cutoffDate } };
     }
 
     const [summaryResult, complianceDistResult, categoryBreakdownResult, trendResult] = await Promise.all([
@@ -188,7 +189,7 @@ export async function getProduct(req, res, next) {
   }
 
   try {
-    const product = await Product.findById(id)
+    const product = await Product.findOne({ _id: id, userId: req.user.userId })
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -233,7 +234,7 @@ export async function uploadProductImage(req, res, next) {
   const { isCloudinaryConfigured } = await import('../services/imageUploadService.js')
 
   try {
-    const product = await Product.findById(id)
+    const product = await Product.findOne({ _id: id, userId: req.user.userId })
     if (!product) {
       return res.status(404).json({
         success: false,

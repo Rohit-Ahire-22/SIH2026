@@ -12,7 +12,7 @@ export async function runProductAnalysis(req, res, next) {
   }
 
   try {
-    const product = await AnalysisOrchestrationService.runFullAnalysis(id)
+    const product = await AnalysisOrchestrationService.runFullAnalysis(id, req.user.userId)
 
     return res.status(200).json({
       success: true,

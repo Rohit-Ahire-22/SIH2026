@@ -47,8 +47,9 @@ export class HybridOcrService {
     const candidateResponse = generateDeclarationCandidates(fullImageResults, { width: imgWidth, height: imgHeight });
     
     if (candidateResponse.status !== 'candidate_generated' || !candidateResponse.candidates.length) {
-      // Return gracefully with just full image results
-      return this._buildResponse(fullImageResults, [], [], startTime);
+      // Return gracefully with just full image results.
+      // Still pass imageBuffer so the orchestrator can reuse it for visual detection.
+      return this._buildResponse(fullImageResults, [], [], startTime, 0, 0, imageBuffer, mimeType);
     }
 
     // Limit candidates for performance (max 3)
@@ -57,9 +58,10 @@ export class HybridOcrService {
     const validRoiEvidence = [];
 
     // 4. Crop & ROI OCR
+    // Pass the already-decoded Jimp image to avoid a second Jimp.read() per crop (Opt 3).
     for (const [index, candidate] of candidates.entries()) {
       try {
-        const cropResult = await RoiCropService.cropRegion(imageBuffer, mimeType, candidate.bbox);
+        const cropResult = await RoiCropService.cropRegion(imageBuffer, mimeType, candidate.bbox, img);
         
         // Run OCR on crop
         const cropOcrResults = await runOcrOnImageBuffer(cropResult.buffer, mimeType);
@@ -103,10 +105,16 @@ export class HybridOcrService {
     // 6. Fuse Results
     const fusedResults = this.fuseOcrResults(fullImageResults, roiDetections);
 
-    return this._buildResponse(fusedResults, validRoiEvidence, candidates, startTime, fullImageResults.length, roiDetections.length);
+    return this._buildResponse(fusedResults, validRoiEvidence, candidates, startTime, fullImageResults.length, roiDetections.length, imageBuffer, mimeType);
   }
 
-  static _buildResponse(fusedResults, roiEvidence, rawCandidates, startTime, fullCount = 0, roiCount = 0) {
+  /**
+   * @param imageBuffer  The raw image bytes that were fetched.  Included in the
+   *   response so the orchestrator can reuse them for visual detection without a
+   *   second Cloudinary download (Opt 2).
+   * @param mimeType  MIME type matching imageBuffer, needed to post to /visual/detect.
+   */
+  static _buildResponse(fusedResults, roiEvidence, rawCandidates, startTime, fullCount = 0, roiCount = 0, imageBuffer = null, mimeType = null) {
     return {
       success: true,
       mode: 'hybrid',
@@ -116,7 +124,10 @@ export class HybridOcrService {
       roiDetections: roiCount,
       fusedDetections: fusedResults.length,
       roiEvidence,
-      results: fusedResults
+      results: fusedResults,
+      // Exposed for orchestrator reuse — avoids a second Cloudinary download.
+      imageBuffer,
+      mimeType,
     };
   }
 

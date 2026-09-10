@@ -3,6 +3,14 @@
  * 
  * Responsible for geometrically fusing OCR text bounding boxes with
  * visual/CV bounding boxes (like the Principal Display Panel).
+ *
+ * V2 changes:
+ *  - Extracted declarations now carry `bbox` (primary spatial source), so
+ *    string-matching against raw OCR detections is used only as a fallback.
+ *  - Provenance (sourceType / confidence / signals / status) is preserved
+ *    through fusion.
+ *  - Fusion output keeps REVIEW-safe behaviour: fields with value null/REVIEW
+ *    are passed through with UNKNOWN spatial relation, never dropped.
  */
 
 /**
@@ -34,10 +42,16 @@ function computeArea(b) {
   return (b.xmax - b.xmin) * (b.ymax - b.ymin);
 }
 
+function assertQuadBbox(bbox) {
+  return Array.isArray(bbox) &&
+    bbox.length === 4 &&
+    bbox.every(p => Array.isArray(p) && p.length === 2)
+}
+
 export class EvidenceFusionService {
   /**
-   * Fuses extracted OCR fields with visual evidence.
-   * @param {Object} extractedFields - Output from ocrFieldExtractionService
+   * Fuses extracted fields with visual evidence.
+   * @param {Object} extractedFields - Output from ocrFieldExtractionService (rich objects with bbox/sourceType)
    * @param {Object} visualResult - Output from VisualDetectionClient
    * @param {Array} ocrDetections - Raw OCR detections containing bboxes
    * @returns {Object} Fused evidence
@@ -53,13 +67,25 @@ export class EvidenceFusionService {
 
     // Safety check for missing visual model
     if (!visualResult || visualResult.inferenceStatus !== "SUCCESS") {
-      // If the model is UNAVAILABLE_MODEL_MISSING, just pass the fields through with UNKNOWN relations
-      for (const [key, fieldData] of Object.entries(extractedFields)) {
-        if (fieldData && fieldData.value !== 'REVIEW') {
+      for (const [key, fieldData] of Object.entries(extractedFields || {})) {
+        if (fieldData && fieldData.value !== 'REVIEW' && fieldData.value !== undefined && fieldData.value !== null) {
           fused.fusedFields[key] = {
             ...fieldData,
             spatialRelationToPdp: "UNKNOWN",
             fusionReason: `Visual inference status: ${visualResult?.inferenceStatus || "UNKNOWN"}`
+          };
+        }
+      }
+      // REVIEW (null-value) declarations are carried through even without a
+      // visual model — they must never be silently dropped from the fusion
+      // surface, since the compliance layer relies on their presence to fail
+      // closed to REVIEW.
+      for (const [key, fieldData] of Object.entries(extractedFields || {})) {
+        if (!(key in fused.fusedFields)) {
+          fused.fusedFields[key] = {
+            ...fieldData,
+            spatialRelationToPdp: "UNKNOWN",
+            fusionReason: "REVIEW declaration preserved through fusion",
           };
         }
       }
@@ -78,29 +104,28 @@ export class EvidenceFusionService {
 
     const pdpAABB = getAABB(fused.pdpBbox);
 
-    // Map fields to their corresponding OCR boxes
-    // ocrFieldExtractionService typically doesn't pass back the exact bbox in the structured output
-    // for all fields perfectly in this iteration. We will look up the text in raw detections to find the bbox.
-    // This is a naive association for demonstration; robust systems would track detection IDs.
-    
-    for (const [key, fieldData] of Object.entries(extractedFields)) {
-      if (!fieldData || fieldData.value === 'REVIEW') continue;
-
+    for (const [key, fieldData] of Object.entries(extractedFields || {})) {
+      // Never drop a field: REVIEW/UNKNOWN declarations are preserved with an
+      // UNKNOWN relation so downstream compliance can fail closed.
       let spatialRelationToPdp = "UNKNOWN";
-      let fusionReason = "PDP not detected or field bbox not found";
+      let fusionReason = "Field has no usable value for spatial fusion";
+
+      if (!fieldData || fieldData.value === 'REVIEW' || fieldData.value === undefined || fieldData.value === null) {
+        fused.fusedFields[key] = {
+          ...fieldData,
+          spatialRelationToPdp,
+          fusionReason: "REVIEW declaration preserved through fusion",
+        };
+        continue;
+      }
 
       if (fused.pdpDetected && pdpAABB) {
-        // Find the matching OCR detection by string matching
-        // In a real system, `fieldData` should carry `detectionId` or `bbox`
-        const textToFind = String(fieldData.value).toLowerCase();
-        const match = ocrDetections.find(d => String(d.text).toLowerCase().includes(textToFind));
-
-        if (match && match.bbox) {
-          const fieldAABB = getAABB(match.bbox);
+        const fieldBBox = this._resolveFieldBBox(fieldData, ocrDetections, key);
+        if (fieldBBox && assertQuadBbox(fieldBBox)) {
+          const fieldAABB = getAABB(fieldBBox);
           if (fieldAABB) {
             const intersectionArea = computeIntersectionArea(fieldAABB, pdpAABB);
             const fieldArea = computeArea(fieldAABB);
-            
             if (fieldArea > 0) {
               const overlapRatio = intersectionArea / fieldArea;
               if (overlapRatio > 0.9) {
@@ -116,28 +141,10 @@ export class EvidenceFusionService {
             }
           }
         } else {
-            // Check if fieldData itself has a bbox (if the extractor was updated to pass it)
-            if (fieldData.bbox) {
-                const fieldAABB = getAABB(fieldData.bbox);
-                if (fieldAABB) {
-                    const intersectionArea = computeIntersectionArea(fieldAABB, pdpAABB);
-                    const fieldArea = computeArea(fieldAABB);
-                    if (fieldArea > 0) {
-                        const overlapRatio = intersectionArea / fieldArea;
-                        if (overlapRatio > 0.9) {
-                            spatialRelationToPdp = "INSIDE";
-                            fusionReason = "OCR bounding box is fully contained within PDP bounding box";
-                        } else if (overlapRatio > 0.1) {
-                            spatialRelationToPdp = "PARTIAL";
-                            fusionReason = "OCR bounding box partially intersects PDP bounding box";
-                        } else {
-                            spatialRelationToPdp = "OUTSIDE";
-                            fusionReason = "OCR bounding box is outside PDP bounding box";
-                        }
-                    }
-                }
-            }
+          fusionReason = "Field has no usable bbox for spatial fusion";
         }
+      } else {
+        fusionReason = "PDP not detected; spatial relation unknown";
       }
 
       fused.fusedFields[key] = {
@@ -148,5 +155,34 @@ export class EvidenceFusionService {
     }
 
     return fused;
+  }
+
+  /**
+   * Resolves the spatial bbox of a declaration: prefers the structured bbox
+   * carried by the extraction service (which reflects the full label+value
+   * region), then falls back to raw OCR string matching.
+   */
+  static _resolveFieldBBox(fieldData, ocrDetections, key) {
+    if (fieldData.bbox && assertQuadBbox(fieldData.bbox)) {
+      return fieldData.bbox;
+    }
+
+    // Fallback: match the raw OCR detection by text.
+    if (fieldData.evidence) {
+      const textToFind = String(fieldData.evidence).toLowerCase();
+      const match = (ocrDetections || []).find(d =>
+        d && String(d.text || '').toLowerCase().includes(textToFind));
+      if (match && match.bbox) return match.bbox;
+    }
+
+    const valueText = fieldData.value !== null && fieldData.value !== undefined
+      ? String(fieldData.value).toLowerCase()
+      : null;
+    if (valueText) {
+      const match = (ocrDetections || []).find(d =>
+        d && String(d.text || '').toLowerCase().includes(valueText));
+      if (match && match.bbox) return match.bbox;
+    }
+    return null;
   }
 }

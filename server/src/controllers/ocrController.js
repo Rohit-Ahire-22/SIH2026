@@ -16,7 +16,7 @@ export async function runProductOcr(req, res, next) {
   }
 
   try {
-    const product = await Product.findById(id)
+    const product = await Product.findOne({ _id: id, userId: req.user.userId })
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -129,7 +129,7 @@ export async function runHybridProductOcr(req, res, next) {
   }
 
   try {
-    const product = await Product.findById(id)
+    const product = await Product.findOne({ _id: id, userId: req.user.userId })
     if (!product) {
       return res.status(404).json({
         success: false,

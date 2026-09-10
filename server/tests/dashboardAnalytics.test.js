@@ -6,7 +6,7 @@ import Product from '../src/models/Product.js';
 describe('Dashboard Analytics Controller', () => {
 
   const createMockReqRes = (query = {}) => {
-    const req = { query };
+    const req = { query, user: { userId: 'test-user' } };
     const res = {
       statusValue: null,
       jsonValue: null,

@@ -66,11 +66,59 @@ function getUnitInfo(normalizedUnit) {
 }
 
 /**
- * Parses and normalizes a net quantity string.
- * @param {string} sourceText - the raw OCR or product text, e.g. "500 g"
+ * Parses and normalizes a net quantity declaration.
+ *
+ * Accepts EITHER:
+ *   - a string: "500 g", "1 kg", "15 L"            (legacy / string path)
+ *   - a structured object: { value: 500, unit: "g" } (canonical pipeline output)
+ *
+ * Both forms yield the same normalized result shape.  The object form is the
+ * canonical representation produced by extractNetQuantity2D and stored on the
+ * product by applyEvidenceToProduct.  The string form is preserved for callers
+ * that still pass raw OCR text and for existing tests.
+ *
+ * @param {string|{value:number,unit:string}} sourceText
  * @returns {Object} normalized structured representation.
  */
 export function normalizeNetQuantity(sourceText) {
+  // ── Structured object path ────────────────────────────────────────────────
+  // The canonical pipeline representation produced by extractNetQuantity2D is
+  //   { value: <number>, unit: <string> }
+  // Accept it directly to avoid a lossy round-trip through a string formatter.
+  if (sourceText !== null && typeof sourceText === 'object' && !Array.isArray(sourceText)) {
+    const rawVal = sourceText.value
+    const rawUnit = sourceText.unit
+
+    // Malformed object: must have a numeric value and a string unit.
+    if (typeof rawVal !== 'number' || !Number.isFinite(rawVal)) {
+      return _unknownResult(sourceText)
+    }
+    if (typeof rawUnit !== 'string' || !rawUnit.trim()) {
+      return _unknownResult(sourceText)
+    }
+
+    const normalizedUnit = normalizeUnitString(rawUnit)
+    const { kind, multiplier } = getUnitInfo(normalizedUnit)
+
+    let baseValue = null
+    let baseUnit = null
+    if (kind !== QUANTITY_KINDS.UNKNOWN && multiplier !== null) {
+      baseValue = rawVal * multiplier
+      baseUnit = BASE_UNITS[kind]
+    }
+
+    return {
+      value: rawVal,
+      unit: normalizedUnit,
+      quantityKind: kind,
+      baseValue,
+      baseUnit,
+      // Preserve original for audit trail
+      sourceText: `${rawVal} ${rawUnit}`,
+    }
+  }
+
+  // ── String path (legacy / raw OCR text) ──────────────────────────────────
   if (typeof sourceText !== 'string') {
     return _unknownResult(sourceText)
   }
@@ -80,11 +128,11 @@ export function normalizeNetQuantity(sourceText) {
     return _unknownResult(text)
   }
 
-  // Regex to extract numeric value and unit. 
+  // Regex to extract numeric value and unit.
   // e.g. "500 g", "0.5kg", "1.5 L", "10 pcs"
-  // Negative numbers should be parsed to fail validation downstream.
+  // Negative numbers are parsed so they fail validation downstream.
   const match = text.match(/^(-?\d+(?:\.\d+)?)\s*([a-zA-Z.2]+(?:[ \.]?[a-zA-Z]+)?)$/)
-  
+
   if (!match) {
     return _unknownResult(text)
   }

@@ -1,5 +1,27 @@
+import {
+  SOURCE_TYPE,
+  classifyMrpValue,
+  classifyQuantityValue,
+  classifyDateValue,
+  getBoxCenter,
+  getBoxHeight,
+  getBoxWidth,
+  getFontSize,
+  computeDistance,
+  computeBoundingBox,
+  normalizeQuantityUnit,
+} from './declarationConceptService.js'
+import { inferCandidates } from './contextualInferenceService.js'
+
+export const SOURCE_TYPES = SOURCE_TYPE
+
 export const DATE_LABELS = {
-  dateOfManufacture: /(?:^|\W)\s*(?:date\s+of\s+manufacture|mfg(?:\.)?\s*(?:date|dt\b)|mfd(?:\.)?|manufactur(?:ed|ing)\s*(?:date|on)?)\s*[:\-.]?\s*/i,
+  // Matches explicit manufacture-date labels only.  The negative lookahead
+  // (?!\s*by\b) prevents "MFD.BY" from matching, and manufacture labels are
+  // required to carry an explicit "date"/"on" word so vendor phrases such as
+  // "Manufactured&Marketed by", "Manufactured by", "Mfg. by" never anchor a
+  // date extraction (see Stage 7.12 defect product_017 mfd=2025-01-01).
+  dateOfManufacture: /(?:^|\W)\s*(?:date\s+of\s+manufacture|manufacture\s+date|mfg\.?\s+(?:date|dt)\b|mfd\.?(?!\.?\s*by\b)|manufactur(?:ed|ing)\s+(?:date|on)\b(?!\s+by\b))\s*[:\-.]?\s*/i,
   dateOfPacking: /(?:^|\W)\s*(?:date\s+of\s+packing|packed\s+on|packing\s+date|pkd(?:\.)?)\s*[:\-.]?\s*/i,
   expiryOrUseByDate: /(?:^|\W)\s*(?:expiry\s*(?:date)?|use\s+by|best\s+before|exp(?:\.)?\s*(?:date)?|bbe)\s*[:\-.]?\s*/i,
 }
@@ -69,8 +91,312 @@ export function extractProductFields(ocrResults) {
     manufacturerName,
     consumerCareDetails,
     brandName,
-    productName
+    productName,
   }
+}
+
+/**
+ * Extracts declarations with full provenance tracking.  Runs the explicit
+ * extraction pass, then an IMPLICIT pass that recognizes standalone values
+ * (e.g. "₹120", "100 g", "08/2026") without an adjacent declaration label,
+ * provided sufficient contextual evidence exists.
+ *
+ * Every field carries:
+ *   concept, value, sourceType, evidence, bbox, confidence, signals, status
+ *
+ * The result preserves REVIEW semantics: implicit values with weak evidence
+ * are surfaced as REVIEW rather than being silently promoted to PASS.
+ */
+// Canonical evidence value shape:
+//   mrp          -> { value, currency, inclusiveOfTaxes }
+//   netQuantity  -> { value, unit }
+//   dates        -> 'YYYY-MM-DD' string
+//   consumerCare -> { phone?, email? }
+//   others       -> atomic string
+// This guarantees the SAME shape whether the declaration came from the
+// explicit or implicit pass, so downstream consumers never branch on
+// "number vs object".
+export function normalizeEvidenceValue(key, value) {
+  if (value === null || value === undefined) return value
+  const DATE_KEYS = new Set(['dateOfManufacture', 'dateOfPacking', 'expiryOrUseByDate'])
+  if (DATE_KEYS.has(key) && typeof value === 'object') {
+    return value.iso || value.full || (
+      typeof value.value === 'string' ? value.value : String(value.value ?? '')
+    ) || null
+  }
+  if (key === 'netQuantity' && typeof value === 'object' && value.value !== undefined) {
+    return { value: value.value ?? null, unit: value.unit ?? null }
+  }
+  // Handle atomic numeric netQuantity (raw.value = number).
+  if (key === 'netQuantity') {
+    return { value, unit: null }
+  }
+  if (key === 'mrp' && typeof value === 'object' && value.value !== undefined) {
+    return {
+      value: value.value ?? null,
+      currency: value.currency || 'INR',
+      inclusiveOfTaxes: Boolean(value.inclusiveOfTaxes),
+    }
+  }
+  if (key === 'mrp') {
+    return { value, currency: 'INR', inclusiveOfTaxes: false }
+  }
+  return value
+}
+
+export function extractEvidence(ocrResults, options = {}, precomputedExplicit = null) {
+  const nodes = getSpatialNodes(ocrResults)
+  const lines = reconstructLines(ocrResults)
+  const evidenceMap = {}
+
+  // 1. Explicit pass (existing label-anchored extraction).
+  // When the caller has already run extractProductFields (as the orchestrator does),
+  // it can pass the result in to avoid running the same extraction twice.
+  const explicit = precomputedExplicit !== null ? precomputedExplicit : extractProductFields(ocrResults)
+
+  const normToEvidence = (key, raw, concept) => {
+    if (!raw || raw.value === undefined || raw.value === null) return
+    if (raw.value === 'REVIEW') {
+      evidenceMap[key] = {
+        concept,
+        value: null,
+        sourceType: raw.sourceType || SOURCE_TYPE.EXPLICIT_LABEL,
+        evidence: raw.evidence || null,
+        bbox: raw.bbox || null,
+        confidence: raw.confidence !== undefined ? raw.confidence : 1.0,
+        signals: raw.signals || ['explicit_label'],
+        status: 'REVIEW',
+        rawValue: 'REVIEW',
+      }
+      return
+    }
+    const STRUCTURED_VALUE_KEYS = new Set(['mrp', 'netQuantity', 'dateOfManufacture', 'dateOfPacking', 'expiryOrUseByDate'])
+    evidenceMap[key] = {
+      concept,
+      value: normalizeEvidenceValue(key, STRUCTURED_VALUE_KEYS.has(key) ? raw : raw.value),
+      sourceType: raw.sourceType || SOURCE_TYPE.EXPLICIT_LABEL,
+      evidence: raw.evidence || null,
+      bbox: raw.bbox || null,
+      confidence: raw.confidence !== undefined ? raw.confidence : 1.0,
+      signals: raw.signals || ['explicit_label'],
+      status: raw.status || (raw.confidence !== undefined && raw.confidence < 0.75 ? 'REVIEW' : 'PASS'),
+    }
+  }
+
+  normToEvidence('mrp', explicit.mrp, 'MRP')
+  normToEvidence('netQuantity', explicit.netQuantity, 'NET_QUANTITY')
+  normToEvidence('batchLotNumber', explicit.batchLotNumber, 'BATCH_LOT')
+  normToEvidence('dateOfManufacture', explicit.dateOfManufacture, 'DATE_OF_MANUFACTURE')
+  normToEvidence('dateOfPacking', explicit.dateOfPacking, 'DATE_OF_PACKING')
+  normToEvidence('expiryOrUseByDate', explicit.expiryOrUseByDate, 'EXPIRY_USE_BY_BEST_BEFORE')
+  normToEvidence('countryOfOrigin', explicit.countryOfOrigin, 'COUNTRY_OF_ORIGIN')
+  normToEvidence('manufacturerName', explicit.manufacturerName, 'MANUFACTURER')
+  normToEvidence('consumerCareDetails', explicit.consumerCareDetails, 'CONSUMER_CARE')
+  normToEvidence('brandName', explicit.brandName, 'BRAND')
+  normToEvidence('productName', explicit.productName, 'GENERIC_NAME')
+
+  // 2. Implicit pass (contextual inference on standalone values)
+  const implicit = extractImplicitDeclarations(nodes, options, evidenceMap)
+
+  // 3. Merge: implicit fills gaps; explicit always wins on the same field.
+  for (const [key, value] of Object.entries(implicit)) {
+    if (!evidenceMap[key]) {
+      evidenceMap[key] = value
+    } else if (evidenceMap[key].status === 'REVIEW' && value.status !== 'REVIEW') {
+      // Only promote a REVIEW to a stronger IMPLICIT if the implicit signal is
+      // genuinely stronger; otherwise keep both and let the consumer decide.
+      if (value.confidence > (evidenceMap[key].confidence || 0)) {
+        evidenceMap[key] = value
+      }
+    }
+  }
+
+  // 4. Date-relationship reconciliation (downgrade-only, fail-closed).
+  // `explicit === precomputedExplicit` shares the reference that the caller's
+  // applyEvidenceToProduct reads, so mutating it here keeps every consumer
+  // (product fields, evidence fusion, measurement evidence) consistent.
+  reconcileDateRelationships(explicit, evidenceMap)
+
+  return evidenceMap
+}
+
+/**
+ * Detects standalone declaration values ("₹120", "100 g", "08/2026") that are
+ * NOT anchored to an explicit label, using geometry + contextual signals.
+ *
+ * Candidates for the same declaration key are pooled ACROSS nodes and resolved
+ * together, because scan-order last-writer-wins silently discarded a competing
+ * value ("₹7" next to "₹129/-" -> Stage 7.12 product_010).  A single node may
+ * still fill at most ONE field (per-node `break`) so one token like "08/2026"
+ * is never simultaneously declared as MFD, pack date AND expiry.
+ */
+const COMPETITION_AMBIGUITY_MARGIN = 0.15
+
+function extractImplicitDeclarations(nodes, options, evidenceMap) {
+  const result = {}
+  if (!nodes || !nodes.length) return result
+
+  const occupiedBoxes = Object.values(evidenceMap).filter(v => v.bbox).map(v => v.bbox)
+  const imageDims = options.imageDimensions
+
+  const pending = new Map()
+
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
+    const text = node.text
+    if (!text) continue
+
+    // Skip nodes already consumed by explicit extraction.
+    if (isConsumedByEvidence(text, evidenceMap)) continue
+    // Skip nodes that look like pure labels (no value on their own).
+    if (isLabel(text)) continue
+
+    const nearby = findNearbyNodes(nodes, node)
+    const nearbyTexts = nearby.map(n => n.text)
+    const region = imageDims ? classifyRegion(nodes, node, imageDims) : null
+
+    const candidates = inferCandidates(text, {
+      nearbyText: nearbyTexts,
+      declarationRegion: region,
+      prominent: isProminent(node, nodes),
+    })
+
+    for (const cand of candidates) {
+      // A single standalone value (e.g. "08/2026") must map to at most ONE
+      // concept: storing it as MFD and expiry and pack date simultaneously
+      // would fabricate three declarations from one token.  Per-node break.
+      if (!evidenceMap[cand.key]) {
+        // UNKNOWN (< 0.55) means insufficient context to safely declare the
+        // value; weak inference stays out of the evidence map and the field
+        // fails closed to REVIEW.
+        if (cand.status === 'UNKNOWN') continue
+        if (!pending.has(cand.key)) pending.set(cand.key, [])
+        pending.get(cand.key).push({ cand, node, nearby, nearbyTexts })
+        break
+      }
+    }
+  }
+
+  for (const [key, entries] of pending) {
+    const winner = resolveCandidateCompetition(key, entries)
+    const bbox = computeBoundingBox([winner.node.bbox, ...winner.nearby.slice(0, 2).map(n => n.bbox)].filter(Boolean))
+    result[key] = {
+      concept: winner.cand.concept,
+      value: normalizeEvidenceValue(key, winner.cand.parsed),
+      sourceType: SOURCE_TYPE.IMPLICIT_CONTEXT,
+      evidence: winner.node.text + (winner.nearbyTexts.length ? ' ' + winner.nearbyTexts.slice(0, 3).join(' ') : ''),
+      bbox,
+      confidence: winner.cand.confidence,
+      signals: winner.signals,
+      status: winner.cand.status,
+    }
+  }
+  return result
+}
+
+/**
+ * Resolves competing implicit candidates for the same field found in different
+ * OCR nodes.  A narrow confidence margin leaves the field genuinely ambiguous
+ * -> REVIEW (fail closed, never a confident guess).  For MRP, a money-formatted
+ * value is preferred over a bare number when the gap is small, because bare
+ * numbers were only ever allowed REVIEW-level confidence next to a price label.
+ */
+function resolveCandidateCompetition(key, entries) {
+  const sorted = [...entries].sort((a, b) => b.cand.confidence - a.cand.confidence)
+  let winner = sorted[0]
+  const signals = [...winner.cand.signals, `candidate_count:${sorted.length}`]
+
+  const isMoneyFormatted = (e) => e.cand.signals.some((s) => s === 'implicit_currency_symbol' || s === 'implicit_slash_notation')
+
+  if (key === 'mrp') {
+    const money = sorted.find(isMoneyFormatted)
+    if (money && money !== winner && money.cand.confidence >= winner.cand.confidence - 0.1) {
+      signals.push(`rejected_mrp_candidate:${winner.cand.raw}`)
+      winner = money
+    }
+  }
+
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] !== winner) signals.push(`rejected_candidate_${i}:${sorted[i].cand.raw}`)
+    if (winner.cand.confidence - sorted[i].cand.confidence < COMPETITION_AMBIGUITY_MARGIN) {
+      signals.push('competing_candidates_ambiguous')
+      winner = { ...winner, cand: { ...winner.cand, status: 'REVIEW' } }
+      break
+    }
+  }
+
+  return { ...winner, signals }
+}
+
+/**
+ * Downgrade-only date-chain reconciliation (never upgrades).  expiry < mfd,
+ * expiry < pack-date, or expiry === pack-date are impossible for a real
+ * package; they indicate token reuse by OCR (e.g. product_017 dup use-by).
+ * Mutates BOTH the raw explicit result (which applyEvidenceToProduct reads)
+ * and the evidence map (which compliance fusion reads), fail-closed to REVIEW.
+ */
+function reconcileDateRelationships(explicit, evidenceMap) {
+  const conflict = (k) => {
+    const mk = explicit && explicit[k]
+    if (mk && mk.value && mk.value !== 'REVIEW') mk.value = 'REVIEW'
+    const ev = evidenceMap[k]
+    if (ev && ev.value && ev.status !== 'REVIEW') {
+      evidenceMap[k] = {
+        ...ev,
+        status: 'REVIEW',
+        signals: [...(ev.signals || []), 'date_relationship_conflict_downgraded'],
+      }
+    }
+  }
+
+  const mfd = explicit?.dateOfManufacture?.value
+  const pkd = explicit?.dateOfPacking?.value
+  const exp = explicit?.expiryOrUseByDate?.value
+  if (!exp || exp === 'REVIEW') return
+
+  if (mfd && mfd !== 'REVIEW' && exp < mfd) {
+    conflict('expiryOrUseByDate')
+    conflict('dateOfManufacture')
+  }
+  if (pkd && pkd !== 'REVIEW' && exp <= pkd) {
+    conflict('expiryOrUseByDate')
+    conflict('dateOfPacking')
+  }
+}
+
+function isConsumedByEvidence(text, evidenceMap) {
+  const tokens = Object.values(evidenceMap).map(v => String(v.evidence || '')).join(' | ').toLowerCase()
+  return tokens.includes(text.toLowerCase().trim())
+}
+
+function findNearbyNodes(nodes, target) {
+  if (!nodes || !target) return []
+  const size = getFontSize(target.bbox)
+  return nodes
+    .filter(n => n !== target && n.bbox)
+    .map(n => ({ text: n.text, bbox: n.bbox, confidence: n.confidence, dist: computeDistance(target.bbox, n.bbox) }))
+    .filter(n => n.dist > 0 && n.dist < size * 6)
+    .sort((a, b) => a.dist - b.dist)
+}
+
+function isProminent(node, nodes) {
+  if (!node || !nodes || nodes.length < 2) return false
+  const h = getBoxHeight(node.bbox)
+  if (!h) return false
+  const heights = nodes.filter(n => n.bbox).map(n => getBoxHeight(n.bbox)).filter(n => n > 0)
+  if (!heights.length) return false
+  heights.sort((a, b) => a - b)
+  const median = heights[Math.floor(heights.length / 2)]
+  return h > median * 1.5
+}
+
+function classifyRegion(nodes, node, imageDims) {
+  if (!imageDims || !imageDims.height) return false
+  if (!node.bbox) return false
+  // Statistical prior: the lower 35% of the image commonly hosts the
+  // statutory declaration block on Indian retail packages. Used ONLY as a
+  // weak positive signal (never as proof of absence).
+  return node.bbox[0][1] >= imageDims.height * 0.65
 }
 
 export function getSpatialNodes(ocrResults) {
@@ -87,55 +413,6 @@ export function getSpatialNodes(ocrResults) {
     bbox: r.bbox || r.box,
     confidence: r.confidence || 1.0
   }));
-}
-
-function getBoxCenter(box) {
-  if (!box || box.length < 4) return [0, 0];
-  const cx = (box[0][0] + box[2][0]) / 2;
-  const cy = (box[0][1] + box[2][1]) / 2;
-  return [cx, cy];
-}
-
-function getBoxHeight(box) {
-  if (!box || box.length < 4) return 10;
-  return Math.abs(box[2][1] - box[0][1]);
-}
-
-function getBoxWidth(box) {
-  if (!box || box.length < 4) return 10;
-  return Math.abs(box[1][0] - box[0][0]);
-}
-
-function getFontSize(box) {
-  return Math.max(8, Math.min(getBoxHeight(box), getBoxWidth(box)));
-}
-
-function computeDistance(boxA, boxB) {
-  if (!boxA || !boxB) return 99999;
-  const [cxA, cyA] = getBoxCenter(boxA);
-  const [cxB, cyB] = getBoxCenter(boxB);
-  return Math.sqrt(Math.pow(cxA - cxB, 2) + Math.pow(cyA - cyB, 2));
-}
-
-function computeBoundingBox(boxes) {
-  const validBoxes = boxes.filter(b => b && b.length >= 4);
-  if (validBoxes.length === 0) return undefined;
-  const xs = [];
-  const ys = [];
-  for (const box of validBoxes) {
-    for (const point of box) {
-      if (point && point.length >= 2) {
-        xs.push(point[0]);
-        ys.push(point[1]);
-      }
-    }
-  }
-  if (xs.length === 0) return undefined;
-  const minX = Math.min(...xs);
-  const maxX = Math.max(...xs);
-  const minY = Math.min(...ys);
-  const maxY = Math.max(...ys);
-  return [[minX, minY], [maxX, minY], [maxX, maxY], [minX, maxY]];
 }
 
 function averageConfidence(confidences) {
@@ -220,12 +497,12 @@ function find2DField(nodes, labelPattern, valuePattern, rejectPattern, valueExtr
     const labelMatch = labelPattern.exec(anchor.text);
     
     if (labelMatch) {
-      let combinedText = anchor.text.slice(labelMatch.index + labelMatch[0].length).trim();
+      const combinedText = anchor.text.slice(labelMatch.index + labelMatch[0].length).trim();
       let valMatch = valuePattern.exec(combinedText);
       if (valMatch && (!rejectPattern || !rejectPattern.test(valMatch[1] || valMatch[2] || valMatch[3] || valMatch[0]))) {
          const extracted = valueExtractor(valMatch, anchor.text, combinedText, true);
          if (extracted) {
-            candidates.push({ ...extracted, evidence: anchor.text, bbox: anchor.bbox, confidence: anchor.confidence, dist: 0 });
+            candidates.push({ ...extracted, evidence: anchor.text, bbox: anchor.bbox, confidence: anchor.confidence, dist: 0, sourceType: SOURCE_TYPE.EXPLICIT_LABEL });
             continue;
          }
       }
@@ -247,7 +524,7 @@ function find2DField(nodes, labelPattern, valuePattern, rejectPattern, valueExtr
               const evidence = anchor.text + ' ' + neighbor.box.text;
               const bbox = computeBoundingBox([anchor.bbox, neighbor.box.bbox]);
               const conf = averageConfidence([anchor.confidence, neighbor.box.confidence]);
-              candidates.push({ ...extracted, evidence, bbox, confidence: conf, dist: neighbor.dist });
+              candidates.push({ ...extracted, evidence, bbox, confidence: conf, dist: neighbor.dist, sourceType: SOURCE_TYPE.SPATIAL_ASSOCIATION });
               break; 
            }
         }
@@ -267,7 +544,7 @@ function find2DField(nodes, labelPattern, valuePattern, rejectPattern, valueExtr
                 const evidence = anchor.text + ' ' + combined;
                 const bbox = computeBoundingBox([anchor.bbox, neighbor.box.bbox, nextNeighbor.box.bbox]);
                 const conf = averageConfidence([anchor.confidence, neighbor.box.confidence, nextNeighbor.box.confidence]);
-                candidates.push({ ...extracted, evidence, bbox, confidence: conf, dist: neighbor.dist });
+                candidates.push({ ...extracted, evidence, bbox, confidence: conf, dist: neighbor.dist, sourceType: SOURCE_TYPE.SPATIAL_ASSOCIATION });
                 break;
              }
            }
@@ -280,16 +557,31 @@ function find2DField(nodes, labelPattern, valuePattern, rejectPattern, valueExtr
   return candidates.length > 0 ? candidates[0] : null;
 }
 
-const REJECT_NUMBERS = /^(?:\+?91[\s.-]?)?(?:1800[\s.-]?\d{2,4}[\s.-]?\d{3,4}|\d{4}[\s.-]?\d{3}[\s.-]?\d{3}|\d{10})$|^\d{5,6}$|^\d{12,14}$|^\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}$/
+// Shape-based rejection filter — base rules applied to all numeric fields.
+//
+// Rejects values whose SHAPE indicates a non-declaration context:
+//   1. Phone/toll-free   2. PIN code   3. Barcode   4. Date-formatted strings
+const REJECT_NUMBERS = /^(?:\+?91[\s.-]?)?(?:1800[\s.-]?\d{2,4}[\s.-]?\d{3,4}|(?:\d{4}[\s.-]?\d{3}[\s.-]?\d{3})|\d{10})$|^\d{5,6}$|^\d{12,14}$|^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}$/
+
+// MRP-specific rejection: extends the base rejections with shapes that are
+// nonsensical as a Maximum Retail Price even when adjacent to an MRP label.
+//
+//   5. Year-shaped:  standalone 4-digit number in 1800–2099 (lot-code years)
+//   6. Single-digit: bare 1–9 without currency/unit (nonsensical MRP)
+//   7. 5-digit:      postal-code shaped (already covered by REJECT_NUMBERS)
+//   8. 7–11 digits:  goods/GS1 part-number, licence or registration-code shaped
+//      (never a retail MRP; e.g. Stage 7.12 product_008 "013000101")
+const REJECT_NUMBERS_MRP = /^(?:\+?91[\s.-]?)?(?:1800[\s.-]?\d{2,4}[\s.-]?\d{3,4}|(?:\d{4}[\s.-]?\d{3}[\s.-]?\d{3})|\d{10})$|^\d{5,6}$|^\d{7,11}$|^\d{12,14}$|^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}$|^(?:1[89]\d{2}|20\d{2})$|^\d$/
 
 function extractMrp2D(nodes) {
-  return find2DField(nodes, MRP_LABEL, MONEY_PATTERN, REJECT_NUMBERS, (match, text, combinedText, isAnchor) => {
-    // If it matched the bare number group (match[3]) and it's NOT the anchor text, reject it.
-    if (match[3] && !isAnchor) return null;
-    
+  return find2DField(nodes, MRP_LABEL, MONEY_PATTERN, REJECT_NUMBERS_MRP, (match, text, combinedText, isAnchor) => {
+    // Bare-number matches (match[3]) are accepted when the anchor (the MRP
+    // label node) is explicitly adjacent and supplies the semantic context.
+    // This correctly pairs the common "MRP" + "120" split-box OCR layout via
+    // spatial association. REJECT_NUMBERS still blocks phone/PIN/date shapes.
     const rawAmount = match[1] || match[2] || match[3]
     const value = parseFloat(rawAmount.replace(/,/g, ''))
-    if (Number.isFinite(value)) {
+    if (Number.isFinite(value) && value > 0) {
       let inclusive = TAX_INCLUSIVE_PATTERN.test(combinedText) || TAX_INCLUSIVE_PATTERN.test(text);
       if (!inclusive) {
         // Search all nodes for tax inclusive wording
@@ -312,14 +604,50 @@ function extractNetQuantity2D(nodes) {
   });
 }
 
+// Stray label / prose tokens that must never be reported as a lot code.  These
+// are generic English divider words (NOT product-specific); they appear because
+// OCR merges "Batch No." with the NEXT label instead of the code value
+// (Stage 7.12: INDICATES, Pkd, M.R.P.Incl, MFG.DATE, and).
+const BATCH_PROSE_PATTERN = /^(?:and|or|of|the|for|see|top|bottom|seal|pack|coding|code|below|area|year|first|second|two|three|left|right|characters?|months?|month|from|before|after|best|use|by|with|within|inside|outside|indicat(?:es|e|ing|or)|shows?|printed|pkd|packed|mfg|mfd|mrp|incl(?:usive)?|exp(?:iry|\.)?|date|dates?|no\.?|batch|lot)\b/i
+
+// Quantity-shaped values ("42g", "10kg", "5 ml") are a different declaration;
+// they must not be recycled as a lot code just because they sit near a label.
+const BATCH_QUANTITY_PATTERN = /^\d+(?:\.\d+)?\s*(?:g|kg|mg|ml|L|l|cm|mm|%|pc|pcs)\b/i
+
+// Phone-shaped codes belong to consumer-care, never to batch/lot.
+const BATCH_PHONE_PATTERN = /^(?:\+?91[\s.-]?)?(?:1800[\s.-]?\d{2,4}(?:[\s.-]?\d{2,4}){1,2}|\d{4}[\s.-]?\d{3}[\s.-]?\d{3}|\d{10})$/
+
+/**
+ * A lot code must LOOK like a code before it is reported:
+ *   - at least 2 chars, at most 20
+ *   - not a stray English label/divider token
+ *   - not a quantity-shaped value
+ *   - not a phone number
+ *   - contains at least one digit AND either (contains letters) or is a
+ *     multi-digit (>=4 digit) numeric run (so "33-01-2025" is kept while a
+ *     bare count like "24" is not).
+ */
+function isPlausibleBatchCode(raw) {
+  const value = (raw || '').trim()
+  if (!value || value.length < 2 || value.length > 20) return false
+  if (BATCH_PROSE_PATTERN.test(value)) return false
+  if (BATCH_QUANTITY_PATTERN.test(value)) return false
+  if (BATCH_PHONE_PATTERN.test(value)) return false
+  const hasDigit = /\d/.test(value)
+  if (!hasDigit) return false
+  if (/[A-Za-z]/.test(value)) return true
+  const numericLength = value.replace(/[^\d]/g, '').length
+  return numericLength >= 4
+}
+
 function extractBatchLotNumber2D(nodes) {
   return find2DField(nodes, BATCH_LABEL, BATCH_VALUE, null, (match, text, combinedText) => {
     if (/see\s+(?:top|bottom|seal|pack|below|coding)/i.test(combinedText) || /see\s+(?:top|bottom|seal|pack|below|coding)/i.test(text)) {
       return { value: 'REVIEW' };
     }
     const value = stripTrailingPeriod(match[1]).trim()
-    if (/[A-Za-z0-9]/.test(value)) return { value };
-    return null;
+    if (!isPlausibleBatchCode(value)) return null
+    return { value };
   });
 }
 
@@ -334,20 +662,53 @@ function extractDate2D(nodes, labelPattern) {
   });
 }
 
+/**
+ * Rejects a date candidate that sits right after a Rupee/price token.
+ * Without this guard "Rs.5.00 (INCL.OF ALL TAXES)" would read as month 5 /
+ * year 2000 and fabricate an expiry (Stage 7.12 product_004).
+ */
+function isMoneyPrefixedDate(text, index) {
+  if (index <= 0) return false
+  const tail = text.slice(0, index)
+  return /(?:₹|rs\.?|inr|mrp|max(?:imum)?\s+retail\b|retail\s+price|price\b|incl(?:\.|usive)?(?:\s*of)?\s*all\s*taxes?)\s*$/i.test(tail)
+}
+
+/**
+ * Rejects a month-year interpretation when the candidate is glued to a previous
+ * digit run by a separator ("1800-10-22", "33-01-2025"). Those shapes are
+ * toll-free numbers / lot codes, not dates (Stage 7.12 products 020 and 017).
+ */
+function precededByDigitRun(text, index) {
+  if (index <= 0) return false
+  const tail = text.slice(0, index)
+  return /[\d.,][\s/.\-]\s*$/.test(tail) && /\d/.test(tail)
+}
+
 function parseDate(raw) {
   const text = raw.trim()
   if (!text) return null
-  const dmy = text.match(/(?<!\d)(0?[1-9]|[12]\d|3[01])[\s/.\-](0?[1-9]|1[0-2]|[A-Za-z]{3})[\s/.\-](\d{4}|\d{2})(?!\d)/)
-  if (dmy) {
-    let year = dmy[3]
+
+  // Full dates (day-month-year) first: "28-07-2026", "12/08/2026", "1 JAN 2026".
+  const dmy = /(?<!\d)(0?[1-9]|[12]\d|3[01])[\s/.\-](0?[1-9]|1[0-2]|[A-Za-z]{3})[\s/.\-](\d{4}|\d{2})(?!\d)/g
+  let m
+  while ((m = dmy.exec(text)) !== null) {
+    if (isMoneyPrefixedDate(text, m.index) || precededByDigitRun(text, m.index)) continue
+    let year = m[3]
     if (year.length === 2) year = '20' + year
-    return buildIsoDate(year, dmy[2], dmy[1])
+    const iso = buildIsoDate(year, m[2], m[1])
+    if (iso) return iso
   }
-  const my = text.match(/(?<!\d)(0?[1-9]|1[0-2]|[A-Za-z]{3})[\s/.\-](\d{4}|\d{2})(?!\d)/)
-  if (my) {
-    let year = my[2]
+
+  // Month-year fallback: "08/2026", "05-2025".  More dangerous than full dates
+  // (a mere code fragment can look like MM.YY), hence guarded extra strictly.
+  const my = /(?<!\d)(0?[1-9]|1[0-2]|[A-Za-z]{3})[\s/.\-](\d{4}|\d{2})(?!\d)/g
+  let n
+  while ((n = my.exec(text)) !== null) {
+    if (isMoneyPrefixedDate(text, n.index) || precededByDigitRun(text, n.index)) continue
+    let year = n[2]
     if (year.length === 2) year = '20' + year
-    return buildIsoDate(year, my[1], '01')
+    const iso = buildIsoDate(year, n[1], '01')
+    if (iso) return iso
   }
   return null
 }
@@ -387,7 +748,7 @@ function extractCountry(lines) {
         confidence = averageConfidence([confidence, lines[i+1].confidence]);
       }
       value = stripTrailingPeriod(value)
-      if (/[A-Za-z]/.test(value)) return { value, evidence: evidenceText, bbox, confidence }
+      if (/[A-Za-z]/.test(value)) return { value, evidence: evidenceText, bbox, confidence, sourceType: SOURCE_TYPE.EXPLICIT_LABEL }
     }
   }
   return null
@@ -396,7 +757,12 @@ function extractCountry(lines) {
 const MANUFACTURER_STOP_PATTERNS = [
   /trademark|registered|copyright|©|®|™/i,
   /based\s+on\s+lab\s+test/i,
-  /po\s+box|mumbai\s*\d{6}|pin\s*\d{6}/i
+  /po\s+box|mumbai\s*\d{6}|pin\s*\d{6}/i,
+  // Stop at date-like values so "Mfg by XYZ 08/2026" does not swallow a date.
+  /^\d{1,2}[\s/.\-]\d{1,2}[\s/.\-]\d{2,4}$|^\d{1,2}[\s/.\-]\d{4}$|^[A-Za-z]{3}[\s/.\-]\d{4}$/,
+  // Stop at standalone numbers / phone-like tokens.
+  /^\d[\d\s./\-]{3,}$/,
+  /^\+?91[\s.-]?\d+$/,
 ];
 
 function extractManufacturer(lines, nodes) {
@@ -436,7 +802,7 @@ function extractManufacturer(lines, nodes) {
       }
 
       value = stripTrailingPeriod(value).trim()
-      if (/[A-Za-z]/.test(value)) return { value, evidence: evidenceText, bbox, confidence }
+      if (/[A-Za-z]/.test(value)) return { value, evidence: evidenceText, bbox, confidence, sourceType: SOURCE_TYPE.EXPLICIT_LABEL }
     }
   }
   return null

@@ -5,8 +5,8 @@ export class ReportService {
    * Retrieves a Product and normalizes it into a ReportDTO.
    * Throws an error if the product does not exist or analysis is incomplete.
    */
-  static async getReportDto(productId) {
-    const product = await Product.findById(productId);
+  static async getReportDto(productId, userId) {
+    const product = await Product.findOne({ _id: productId, userId });
     
     if (!product) {
       throw new Error(`Product not found with id: ${productId}`);

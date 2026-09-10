@@ -8,10 +8,10 @@ import { ReportDocxGenerator } from '../src/services/reportDocxGenerator.js';
 describe('Report Generation Architecture', () => {
 
   test('Missing product ID throws error safely', async () => {
-    mock.method(Product, 'findById', async () => null);
+    mock.method(Product, 'findOne', async () => null);
     
     try {
-      await ReportService.getReportDto('fake-id');
+      await ReportService.getReportDto('fake-id', 'test-user');
       assert.fail('Should have thrown error');
     } catch (e) {
       assert.match(e.message, /Product not found/);
@@ -27,10 +27,10 @@ describe('Report Generation Architecture', () => {
       analysisStatus: 'PENDING'
     };
     
-    mock.method(Product, 'findById', async () => mockProduct);
+    mock.method(Product, 'findOne', async () => mockProduct);
 
     try {
-      await ReportService.getReportDto('fake-id');
+      await ReportService.getReportDto('fake-id', 'test-user');
       assert.fail('Should have thrown error');
     } catch (e) {
       assert.match(e.message, /Analysis is not completed/);
@@ -59,9 +59,9 @@ describe('Report Generation Architecture', () => {
       updatedAt: new Date()
     };
     
-    mock.method(Product, 'findById', async () => mockProduct);
+    mock.method(Product, 'findOne', async () => mockProduct);
 
-    const dto = await ReportService.getReportDto('1234567890abcdef');
+    const dto = await ReportService.getReportDto('1234567890abcdef', 'test-user');
     assert.equal(dto.metadata.reportId, 'REP-12345678');
     assert.equal(dto.summary.overallStatus, 'FAIL');
     assert.equal(dto.summary.totalChecks, 2);

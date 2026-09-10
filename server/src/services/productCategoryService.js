@@ -49,7 +49,7 @@ const GENERAL_OCR_CONTEXT = {
   food: [/\bfood\b/i, /\beat\b/i, /\bdelicious\b/i, /\btaste\b/i, /\bsnack\b/i, /\bnutrition\b/i, /\bbiscuits?\b/i, /\bchips\b/i, /\bmasala\b/i, /\bspice\b/i],
   beverage: [/\bdrink\b/i, /\bthirst\b/i, /\brefreshing\b/i, /\bliquid\b/i, /\bjuice\b/i, /\bwater\b/i, /\bsoda\b/i, /\btea\b/i, /\bcoffee\b/i],
   cosmetic: [/\bskin\b/i, /\bhair\b/i, /\bbeauty\b/i, /\bglow\b/i, /\bshine\b/i, /\bcomplexion\b/i, /\bshampoo\b/i, /\blotion\b/i, /\bcream\b/i],
-  personal_care: [/\bhygiene\b/i, /\bclean\b/i, /\bfresh\b/i, /\bcare\b/i, /\bsoap\b/i, /\btoothpaste\b/i],
+  personal_care: [/\bhygiene\b/i, /\bsoap\b/i, /\btoothpaste\b/i],
   household: [/\bclean\b/i, /\bwash\b/i, /\bstain\b/i, /\bdirt\b/i, /\bfloor\b/i, /\bsurface\b/i, /\bhome\b/i, /\blaundry\b/i, /\bdetergent\b/i, /\bcleaner\b/i],
   electronics: [/\bdevice\b/i, /\bpower\b/i, /\bcharge\b/i, /\belectronic\b/i, /\badapter\b/i, /\bcharger\b/i],
   pharmaceutical: [/\bhealth\b/i, /\brelief\b/i, /\bpain\b/i, /\bcure\b/i, /\bdoctor\b/i, /\btablets?\b/i, /\bcapsules?\b/i, /\bsyrup\b/i],
@@ -62,13 +62,18 @@ const NEGATIVE_SIGNALS = {
   cosmetic: [/\bnot for human consumption\b/i, /\bpoison\b/i, /\bdo not apply on skin\b/i]
 }
 
+// Unit-based field signals provide a WEAK (weight +1) hint only.
+// IMPORTANT: Volume units (ml, L) are used by beverages, cosmetics, AND household
+// products (e.g. liquid detergent).  Mass units (g, kg) are used by food, household,
+// AND cosmetics.  These signals are NOT category-exclusive — they only weakly tip
+// the scorer when other signals are already present.
 const FIELD_SIGNALS = {
   food: { unit: ['g', 'kg'] },
-  beverage: { unit: ['ml', 'l', 'liter'] },
-  cosmetic: { unit: ['ml', 'g', 'oz'] },
+  beverage: { unit: ['ml', 'l'] },
+  cosmetic: { unit: ['ml', 'g'] },
   household: { unit: ['ml', 'l', 'kg', 'g'] },
   electronics: { unit: ['units', 'n', 'u'] },
-  pharmaceutical: { unit: ['mg', 'ml', 'tablets', 'capsules'] }
+  pharmaceutical: { unit: ['mg', 'ml'] }
 }
 
 export function detectProductCategory(productInfo) {
@@ -168,7 +173,10 @@ export function detectProductCategory(productInfo) {
   let confidence = 0;
 
   if (top.score >= 8) {
-     if (top.score >= runnerUp.score * 1.5 || (top.score - runnerUp.score >= 5)) {
+     // Require a clear margin: the top category must outscore the runner-up
+     // by at least 8 points OR by a 1.5× ratio to earn DETECTED status.
+     // A smaller margin means too many signals are shared → REVIEW.
+     if (top.score >= runnerUp.score * 1.5 || (top.score - runnerUp.score >= 8)) {
          status = DETECTION_STATUS.DETECTED;
          confidence = Math.min(0.8 + (top.score / 50), 0.99);
      } else {

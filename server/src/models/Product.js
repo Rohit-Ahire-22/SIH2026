@@ -44,6 +44,7 @@ const ocrResultSchema = new Schema(
 
 const productSchema = new Schema(
   {
+    userId: { type: Schema.Types.ObjectId, required: true, index: true, ref: 'User' },
     productName: { type: String, required: true, trim: true, index: true },
     brandName: { type: String, trim: true, index: true },
     manufacturerName: { type: String, trim: true },
@@ -146,6 +147,7 @@ const productSchema = new Schema(
 productSchema.index({ createdAt: -1 })
 productSchema.index({ category: 1 })
 productSchema.index({ manufacturerName: 1 })
+productSchema.index({ userId: 1, createdAt: -1 })
 
 function roundCurrency(value) {
   if (typeof value === 'number' && Number.isFinite(value)) {

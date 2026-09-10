@@ -7,10 +7,10 @@ import { HybridOcrService } from '../src/services/hybridOcrService.js';
 describe('Analysis Orchestration Service', () => {
 
   test('Missing product ID throws error safely', async () => {
-    mock.method(Product, 'findById', async () => null);
+    mock.method(Product, 'findOne', async () => null);
     
     try {
-      await AnalysisOrchestrationService.runFullAnalysis('fake-id');
+      await AnalysisOrchestrationService.runFullAnalysis('fake-id', 'test-user');
       assert.fail('Should have thrown error');
     } catch (e) {
       assert.match(e.message, /Product not found/);
@@ -27,10 +27,10 @@ describe('Analysis Orchestration Service', () => {
       save: mock.fn(async () => {})
     };
     
-    mock.method(Product, 'findById', async () => mockProduct);
+    mock.method(Product, 'findOne', async () => mockProduct);
 
     try {
-      await AnalysisOrchestrationService.runFullAnalysis('fake-id');
+      await AnalysisOrchestrationService.runFullAnalysis('fake-id', 'test-user');
       assert.fail('Should have thrown error');
     } catch (e) {
       assert.match(e.message, /Product has no images to analyze/);
@@ -55,14 +55,14 @@ describe('Analysis Orchestration Service', () => {
       toObject: () => ({ productName: 'OCR Fail Product' })
     };
     
-    mock.method(Product, 'findById', async () => mockProduct);
+    mock.method(Product, 'findOne', async () => mockProduct);
     
     // Mock the OCR service to throw an error (simulating FastAPI down)
     mock.method(HybridOcrService, 'runHybridOcr', async () => {
       throw new Error('ECONNREFUSED');
     });
 
-    const result = await AnalysisOrchestrationService.runFullAnalysis('fake-id');
+    const result = await AnalysisOrchestrationService.runFullAnalysis('fake-id', 'test-user');
     
     assert.equal(result.analysisStatus, 'COMPLETED');
     assert.match(result.analysisError, /ECONNREFUSED/);
