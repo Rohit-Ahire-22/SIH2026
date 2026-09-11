@@ -1,13 +1,110 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, AlertCircle, LayoutDashboard, Calendar, Search } from 'lucide-react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, CheckCircle, XCircle, AlertCircle, LayoutDashboard, Calendar, Search, MapPin, FileText } from 'lucide-react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import ExtractedFieldsPanel from '../components/ocr/ExtractedFieldsPanel';
 import OcrImageViewer from '../components/ocr/OcrImageViewer';
+import AiAssistantPanel from '../components/AiAssistantPanel';
 import { API_URL } from '../config';
+
+// ─── Location capture state ───────────────────────────────────────────────────
+function LocationCapture({ productId, existingLocation, onSaved }) {
+  const [saving, setSaving] = useState(false);
+  const [locError, setLocError] = useState(null);
+  const [locSuccess, setLocSuccess] = useState(false);
+  const [manualLat, setManualLat] = useState('');
+  const [manualLng, setManualLng] = useState('');
+  const [showManual, setShowManual] = useState(false);
+
+  const saveLocation = async (lat, lng, accuracy, source) => {
+    setSaving(true); setLocError(null);
+    try {
+      const res = await fetch(`${API_URL}/products/${productId}/location`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ latitude: lat, longitude: lng, accuracy, source }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message);
+      setLocSuccess(true);
+      if (onSaved) onSaved(json.data.location);
+    } catch (err) { setLocError(err.message); }
+    finally { setSaving(false); }
+  };
+
+  const captureGps = () => {
+    if (!navigator.geolocation) { setLocError('Geolocation not supported by this browser.'); return; }
+    navigator.geolocation.getCurrentPosition(
+      pos => saveLocation(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, 'GPS'),
+      () => setLocError('Could not retrieve GPS location. Please allow location access or enter manually.'),
+      { timeout: 15000 }
+    );
+  };
+
+  const saveManual = () => {
+    const lat = parseFloat(manualLat); const lng = parseFloat(manualLng);
+    if (!Number.isFinite(lat) || lat < -90 || lat > 90) { setLocError('Invalid latitude (must be -90 to 90).'); return; }
+    if (!Number.isFinite(lng) || lng < -180 || lng > 180) { setLocError('Invalid longitude (must be -180 to 180).'); return; }
+    saveLocation(lat, lng, null, 'MANUAL');
+  };
+
+  if (locSuccess) {
+    return (
+      <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+        <CheckCircle size={16} /> Location saved successfully.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {existingLocation?.latitude && (
+        <div className="text-xs text-gray-500 font-mono bg-gray-50 border rounded px-2 py-1">
+          Current: {existingLocation.latitude.toFixed(5)}, {existingLocation.longitude.toFixed(5)} ({existingLocation.source})
+        </div>
+      )}
+      <div className="flex flex-wrap gap-2">
+        <button onClick={captureGps} disabled={saving}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm rounded-lg font-medium">
+          <MapPin size={14} /> {saving ? 'Saving…' : 'Use GPS'}
+        </button>
+        <button onClick={() => setShowManual(!showManual)}
+          className="px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50 text-gray-600">
+          Enter Manually
+        </button>
+      </div>
+      {showManual && (
+        <div className="flex gap-2 items-end">
+          <div>
+            <label className="text-xs text-gray-500 font-medium block mb-0.5">Latitude</label>
+            <input value={manualLat} onChange={e => setManualLat(e.target.value)} placeholder="e.g. 18.5204"
+              className="border rounded px-2 py-1 text-sm w-28 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div>
+            <label className="text-xs text-gray-500 font-medium block mb-0.5">Longitude</label>
+            <input value={manualLng} onChange={e => setManualLng(e.target.value)} placeholder="e.g. 73.8567"
+              className="border rounded px-2 py-1 text-sm w-28 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <button onClick={saveManual} disabled={saving}
+            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm rounded-lg">
+            Save
+          </button>
+        </div>
+      )}
+      {locError && (
+        <div className="flex items-center gap-1.5 text-xs text-red-600">
+          <AlertCircle size={12} /> {locError}
+        </div>
+      )}
+    </div>
+  );
+}
+// ───────────────────────────────────────────────────────────────────────────────
 
 function ComplianceResultPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -238,6 +335,43 @@ function ComplianceResultPage() {
           </div>
         </div>
 
+        {/* Action buttons — Report + Location */}
+        {analysisStatus === 'COMPLETED' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Report potential non-compliance */}
+            <div className="bg-white border rounded-xl shadow-sm p-5">
+              <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                <FileText size={16} className="text-red-500" /> Report Non-Compliance
+              </h3>
+              <p className="text-xs text-gray-500 mb-3">
+                If this inspection result indicates a compliance concern, you can submit a report for review by an authorised reviewer.
+              </p>
+              <button
+                onClick={() => navigate(`/complaints/new?productId=${id}`)}
+                className="w-full py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg text-sm transition-colors"
+                id="report-noncompliance-btn"
+              >
+                Report Potential Non-Compliance
+              </button>
+            </div>
+
+            {/* Location capture */}
+            <div className="bg-white border rounded-xl shadow-sm p-5">
+              <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                <MapPin size={16} className="text-blue-500" /> Inspection Location
+              </h3>
+              <p className="text-xs text-gray-500 mb-3">
+                Optionally record where this product was inspected. Location does not affect the compliance result.
+              </p>
+              <LocationCapture
+                productId={id}
+                existingLocation={productData?.location}
+                onSaved={(loc) => setProductData(prev => prev ? { ...prev, location: loc } : prev)}
+              />
+            </div>
+          </div>
+        )}
+
         {/* Rules Breakdown */}
         <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
           <div className="bg-gray-50 p-4 border-b">
@@ -286,6 +420,11 @@ function ComplianceResultPage() {
             })}
           </div>
         </div>
+
+        {/* AI Compliance Assistant */}
+        {analysisStatus === 'COMPLETED' && (
+          <AiAssistantPanel productId={id} />
+        )}
 
       </div>
     </DashboardLayout>

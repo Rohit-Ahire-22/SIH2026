@@ -137,6 +137,15 @@ const productSchema = new Schema(
     // OCR extraction, rule-engine results, evidence, compliance scoring,
     // and inspection history will be added in later steps.
     metadata: { type: Schema.Types.Mixed, default: {} },
+
+    // Optional inspection location — does NOT affect compliance analysis
+    location: {
+      latitude: { type: Number, min: -90, max: 90 },
+      longitude: { type: Number, min: -180, max: 180 },
+      accuracy: { type: Number, min: 0 },
+      source: { type: String, enum: ['GPS', 'MANUAL'] },
+      capturedAt: { type: Date },
+    },
   },
   {
     timestamps: true,
