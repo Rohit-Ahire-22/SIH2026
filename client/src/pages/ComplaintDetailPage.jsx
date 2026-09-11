@@ -76,9 +76,13 @@ export default function ComplaintDetailPage() {
       <div className="max-w-3xl mx-auto pb-12 space-y-5">
         {/* Back + header */}
         <div>
-          <Link to="/complaints" className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-3">
-            <ArrowLeft size={14} /> My Complaints
-          </Link>
+          <div className="flex items-center gap-3 mb-3">
+            <Link to="/" className="text-sm text-gray-500 hover:text-blue-600">← Dashboard</Link>
+            <span className="text-gray-300">|</span>
+            <Link to="/complaints" className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800">
+              <ArrowLeft size={14} /> My Complaints
+            </Link>
+          </div>
           <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 font-mono">{complaint.complaintNumber}</h1>

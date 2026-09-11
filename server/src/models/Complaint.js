@@ -160,17 +160,12 @@ complaintSchema.index({ productId: 1 })
  * Pre-save hook: generate complaintNumber before first save.
  * CMP-YYYY-NNNNNN format, e.g. CMP-2026-000001
  */
-complaintSchema.pre('save', async function (next) {
+complaintSchema.pre('save', async function () {
   if (this.isNew && !this.complaintNumber) {
-    try {
-      const seq = await nextSequence('complaint')
-      const year = new Date().getFullYear()
-      this.complaintNumber = `CMP-${year}-${String(seq).padStart(6, '0')}`
-    } catch (err) {
-      return next(err)
-    }
+    const seq = await nextSequence('complaint')
+    const year = new Date().getFullYear()
+    this.complaintNumber = `CMP-${year}-${String(seq).padStart(6, '0')}`
   }
-  next()
 })
 
 const Complaint = mongoose.models.Complaint || mongoose.model('Complaint', complaintSchema)

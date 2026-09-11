@@ -106,11 +106,12 @@ export default function ViolationMapPage() {
 
         {/* Summary cards */}
         {summary && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             <SummaryCard icon={BarChart2} label="Total Inspections" value={summary.summary.total} color="bg-blue-50 text-blue-600" />
             <SummaryCard icon={CheckCircle} label="Compliant" value={summary.summary.compliant} color="bg-green-50 text-green-600" />
             <SummaryCard icon={XCircle} label="Non-Compliant" value={summary.summary.nonCompliant} color="bg-red-50 text-red-600" />
             <SummaryCard icon={AlertCircle} label="Review Required" value={summary.summary.review} color="bg-amber-50 text-amber-600" />
+            <SummaryCard icon={Clock} label="Pending" value={summary.summary.pending} color="bg-gray-50 text-gray-600" />
           </div>
         )}
 

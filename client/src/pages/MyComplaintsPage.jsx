@@ -66,7 +66,7 @@ export default function MyComplaintsPage() {
   const setFilter = (key, value) => {
     const np = new URLSearchParams(searchParams);
     if (value) np.set(key, value); else np.delete(key);
-    np.set('page', '1');
+    if (key !== 'page') np.set('page', '1');
     setSearchParams(np);
   };
 

@@ -47,13 +47,22 @@ function extractNutrient(text, definition) {
 
   for (const alias of definition.aliases) {
     const aliasRegex = new RegExp(
-      `(?:^|\\s|,)${alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[:\\s]+`,
+      `(?:^|\\s|,)${alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:[:\\s]|$)`,
       'i',
     )
 
-    for (const line of lines) {
-      if (aliasRegex.test(line)) {
-        const numMatch = line.match(NUMERIC_PATTERN)
+    for (let i = 0; i < lines.length; i++) {
+      if (aliasRegex.test(lines[i])) {
+        // Prefer a value on the same line. OCR often separates the nutrient
+        // label and value onto adjacent lines (e.g. "ENERGY" then "451 kcal"),
+        // so check the following line too — but only accept a value there if
+        // it carries an explicit unit, to avoid pulling an unrelated number
+        // from a following line (e.g. a stray "na" OCR fragment).
+        const sameLineMatch = lines[i].match(NUMERIC_PATTERN)
+        const nextLineMatch = /(?:^|\s|,)(\d+(?:[.,]\d+)?)\s*(kcal|kj|g|mg|ml|%|mcg|μg|kg|mmol)(?:\s|$)/i.exec(
+          lines[i + 1] ?? '',
+        )
+        const numMatch = sameLineMatch || nextLineMatch
         if (numMatch) {
           const value = parseFloat(numMatch[1].replace(',', '.'))
           const unit = numMatch[2] || definition.unit || null
@@ -68,25 +77,94 @@ function extractNutrient(text, definition) {
   return { value: null, unit: null, confidence: 0 }
 }
 
+const OCR_FETCH_TIMEOUT_MS = 20000
+const OCR_TIMEOUT_MS = 60000
+const ALLOWED_MIME_TO_EXT = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/bmp': 'bmp',
+}
+
+const EXT_TO_MIME = Object.fromEntries(
+  Object.entries(ALLOWED_MIME_TO_EXT).map(([mime, ext]) => [ext, mime]),
+)
+
+function resolveMimeType(imageUrl, fallbackMime) {
+  const match = /\.([a-zA-Z0-9]+)(?:[?#].*)?$/.exec(imageUrl || '')
+  const ext = match ? match[1].toLowerCase() : null
+  return (ext && EXT_TO_MIME[ext]) || fallbackMime || 'image/png'
+}
+
+function buildNutritionFilename(imageUrl, mimeType) {
+  const match = /\.([a-zA-Z0-9]+)(?:[?#].*)?$/.exec(imageUrl || '')
+  const ext = match ? match[1].toLowerCase() : null
+  const resolvedExt = (ext && ALLOWED_MIME_TO_EXT[`image/${ext}`]) || ALLOWED_MIME_TO_EXT[mimeType || ''] || 'png'
+  return `nutrition_label.${resolvedExt}`
+}
+
+async function fetchImageBytes(imageUrl) {
+  let response
+  try {
+    response = await fetch(imageUrl, {
+      signal: AbortSignal.timeout(OCR_FETCH_TIMEOUT_MS),
+    })
+  } catch (err) {
+    if (err.name === 'TimeoutError' || err.name === 'AbortError') {
+      throw new Error(
+        `Timed out fetching nutrition label image for OCR after ${OCR_FETCH_TIMEOUT_MS} ms`,
+      )
+    }
+    throw new Error(`Failed to fetch nutrition label image for OCR: ${err.message}`)
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch nutrition label image for OCR (status ${response.status})`,
+    )
+  }
+
+  return {
+    buffer: Buffer.from(await response.arrayBuffer()),
+    mimeType: response.headers.get('content-type') || 'image/jpeg',
+  }
+}
+
 /**
  * Calls the PaddleOCR AI service to extract raw text from an image URL.
- * Uses a direct call to the OCR service — NOT the compliance pipeline.
+ * Uses the same multipart transport + service-key header as the compliance
+ * OCR client (ocrClientService.js) — the /ocr endpoint requires a file
+ * upload field named "image" and an X-AI-Service-Key header. It does NOT
+ * accept a JSON { image_url } payload.
+ *
+ * This is a direct call to the OCR service — NOT the compliance pipeline.
  *
  * @param {string} imageUrl - Public image URL to OCR
  * @returns {Promise<string>} Extracted raw text
  */
 async function callOcrForNutrition(imageUrl) {
-  const aiServiceUrl = config.aiServiceUrl
-  const timeoutMs = 60000
+  const aiServiceUrl = (config.aiServiceUrl || '').replace(/\/+$/, '')
+  const endpoint = `${aiServiceUrl}/ocr`
+
+  const { buffer, mimeType: responseMime } = await fetchImageBytes(imageUrl)
+  const filename = buildNutritionFilename(imageUrl, responseMime)
+  const blobMimeType = resolveMimeType(imageUrl, responseMime)
+
+  const form = new FormData()
+  form.append('image', new Blob([buffer], { type: blobMimeType }), filename)
+  form.append('variant', 'original')
 
   const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+  const timeoutId = setTimeout(() => controller.abort(), OCR_TIMEOUT_MS)
 
   try {
-    const response = await fetch(`${aiServiceUrl}/ocr`, {
+    const response = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image_url: imageUrl }),
+      body: form,
+      headers: {
+        'X-AI-Service-Key': process.env.AI_SERVICE_API_KEY || '',
+        Accept: 'application/json',
+      },
       signal: controller.signal,
     })
 
@@ -108,7 +186,7 @@ async function callOcrForNutrition(imageUrl) {
     return ''
   } catch (err) {
     clearTimeout(timeoutId)
-    if (err.name === 'AbortError') {
+    if (err.name === 'AbortError' || err.name === 'TimeoutError') {
       throw new Error('Nutrition OCR timed out')
     }
     throw err

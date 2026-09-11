@@ -1,4 +1,13 @@
+import mongoose from 'mongoose'
 import Product from '../models/Product.js'
+
+// Aggregation pipelines do NOT auto-cast string userId to ObjectId the way
+// .find() / .countDocuments() do. Convert explicitly so $match works.
+function asObjectIdValue(value) {
+  return mongoose.Types.ObjectId.isValid(value)
+    ? new mongoose.Types.ObjectId(value)
+    : value
+}
 
 /**
  * Violation Intelligence Service
@@ -59,7 +68,7 @@ export async function getMapData(userId, filters = {}) {
  * @param {object} filters - { from, to }
  */
 export async function getAreaSummary(userId, filters = {}) {
-  const matchStage = { userId: { $eq: userId } }
+  const matchStage = { userId: { $eq: asObjectIdValue(userId) } }
 
   if (filters.from || filters.to) {
     matchStage.createdAt = {}

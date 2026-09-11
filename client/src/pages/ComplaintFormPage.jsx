@@ -187,9 +187,13 @@ export default function ComplaintFormPage() {
       <div className="max-w-2xl mx-auto pb-12">
         {/* Header */}
         <div className="mb-6">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-3">
-            <ArrowLeft size={14} /> Back to inspection
-          </button>
+          <div className="flex items-center gap-3 mb-3">
+            <button onClick={() => navigate('/')} className="text-sm text-gray-500 hover:text-blue-600">← Dashboard</button>
+            <span className="text-gray-300">|</span>
+            <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800">
+              <ArrowLeft size={14} /> Back to inspection
+            </button>
+          </div>
           <h1 className="text-2xl font-bold text-gray-900">Report Potential Non-Compliance</h1>
           <p className="text-sm text-gray-500 mt-1">
             This will create a complaint for internal review. Submission does not constitute an official legal filing.
