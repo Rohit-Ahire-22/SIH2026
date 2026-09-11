@@ -1,25 +1,30 @@
 /**
  * AI Chat Service — Compliance Assistant
  *
- * Configurable provider interface for the AI compliance assistant.
+ * Gemini (unofficial) provider interface for the AI compliance assistant using
+ * Google's official `@google/genai` SDK. Uses the Gemini API Free Tier.
  * The compliance system MUST continue working if this service is unavailable.
  *
  * Environment variables:
- *   AI_CHAT_PROVIDER  — 'openai' | 'google' | (leave unset for unavailable state)
- *   AI_CHAT_MODEL     — e.g. 'gpt-4o-mini' or 'gemini-1.5-flash'
- *   AI_CHAT_API_KEY   — API key for the configured provider
+ *   AI_CHAT_PROVIDER  — 'gemini' | (leave unset for unavailable state)
+ *   AI_CHAT_MODEL     — e.g. 'gemini-3.5-flash-lite' (Free Tier eligible)
+ *   AI_CHAT_API_KEY   — Gemini API key (server-side only, never exposed)
+ *
+ * The API key is read server-side and is never sent to, or logged from,
+ * the browser or any API response.
  *
  * If no provider is configured, all methods return { available: false }.
  * Errors do NOT propagate to the compliance pipeline.
  */
+import { GoogleGenAI } from '@google/genai'
 
-const SYSTEM_PROMPT = `You are a compliance assistant for the Packaged Commodity Compliance System (SIH26034).
-You help inspectors understand existing inspection results under Legal Metrology (Packaged Commodities) Rules, 2011.
+const SYSTEM_PROMPT = `You are the AI assistant for the Packaged Commodity Compliance System (SIH26034), a platform for Legal Metrology (Packaged Commodities) Rules, 2011 compliance inspections.
+You assist inspectors across the whole platform.
 
 STRICT RULES you must follow:
-- You ONLY explain the inspection data provided to you. Do not invent evidence.
-- Do NOT change or override the compliance status (COMPLIANT/NON_COMPLIANT/REVIEW/PENDING).
-- Do NOT claim that a violation is legally confirmed. The final legal determination is made by authorized authorities.
+- You ONLY explain the data provided to you in the context. Do not invent evidence, values, or legal requirements not present in the context.
+- Do NOT change or override a compliance status (COMPLIANT/NON_COMPLIANT/REVIEW/PENDING).
+- Do NOT claim that a violation is legally confirmed. The final legal determination is made by authorized authorities. Use formulations like "Based on the available inspection data…".
 - Do NOT invent legal requirements not present in the inspection context.
 - If the provided data is insufficient to answer a question, say so clearly.
 - Use professional, factual language. Avoid speculation.
@@ -27,10 +32,10 @@ STRICT RULES you must follow:
 
 You may explain:
 - What each rule check means (Rule 6, Rule 7, Rule 8, Rule 9, Rule 11)
-- What evidence was found or not found
-- Why a check received PASS/FAIL/REVIEW status
-- What "REVIEW" means in practice
-- What fields were extracted and from where`
+- What evidence was found or not found, and why a check received PASS/FAIL/REVIEW status
+- What "REVIEW" means in practice and what fields were extracted and from where
+- When inspection context is not provided (e.g. a general page-level question), still ground your answer in general knowledge while explicitly noting you cannot see that inspection's data.
+- Non-inspection topics (nutrition scanner, complaints, violation map, dashboards) in a helpful but cautious way — never provide medical advice.`
 
 /**
  * Builds a safe, structured context object from a Product document.
@@ -101,11 +106,33 @@ export function isAiChatAvailable() {
 }
 
 /**
+ * Maps provider errors to a safe, user-facing message.
+ * HTTP 429 (rate limit) gets a friendly "try again later" message instead of
+ * a scary error.
+ *
+ * @param {Error} err
+ * @returns {{ code: string, message: string }}
+ */
+export function describeAiError(err) {
+  if (err && err.code === 'AI_RATE_LIMITED') {
+    return {
+      code: 'AI_RATE_LIMITED',
+      message: 'The AI assistant is currently rate-limited. Please wait a moment and try again.',
+    }
+  }
+  return {
+    code: err && err.code ? err.code : 'AI_UNAVAILABLE',
+    message: 'The AI assistant is temporarily unavailable. Please try again later.',
+  }
+}
+
+/**
  * Calls the configured AI provider with the inspection context and user question.
  *
  * @param {object} context - Safe inspection context from buildInspectionContext()
+ *   OR a minimal global context object { page, summary } when no inspection is open.
  * @param {string} question - User's question
- * @returns {Promise<string>} AI response text
+ * @returns {Promise<string|null>} AI response text, or null when unconfigured/unavailable
  */
 export async function askComplianceQuestion(context, question) {
   if (!isAiChatAvailable()) {
@@ -116,13 +143,10 @@ export async function askComplianceQuestion(context, question) {
   const model = process.env.AI_CHAT_MODEL
   const apiKey = process.env.AI_CHAT_API_KEY
 
-  const userMessage = `Inspection context:\n${JSON.stringify(context, null, 2)}\n\nQuestion: ${question}`
+  const userMessage = `Context:\n${JSON.stringify(context, null, 2)}\n\nQuestion: ${question}`
 
   try {
-    if (provider === 'openai') {
-      return await callOpenAI(apiKey, model, userMessage)
-    }
-    if (provider === 'google') {
+    if (provider === 'gemini') {
       return await callGemini(apiKey, model, userMessage)
     }
     console.warn(`[AiChat] Unknown provider: ${provider}`)
@@ -133,57 +157,59 @@ export async function askComplianceQuestion(context, question) {
   }
 }
 
-// ─── Provider implementations ─────────────────────────────────────────────────
+// ─── Provider implementation (Gemini Free Tier via @google/genai) ──────────────
 
-async function callOpenAI(apiKey, model, userMessage) {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: userMessage },
-      ],
-      max_tokens: 600,
-      temperature: 0.3,
-    }),
-    signal: AbortSignal.timeout(30000),
-  })
-
-  if (!response.ok) {
-    const err = await response.text()
-    throw new Error(`OpenAI API error ${response.status}: ${err}`)
-  }
-
-  const data = await response.json()
-  return data.choices?.[0]?.message?.content || 'No response received.'
+/**
+ * Test seam — replaces the Gemini client factory so unit tests can exercise the
+ * full askComplianceQuestion → callGemini → generateContent path without any
+ * real network call. Production always uses the official GoogleGenAI client.
+ */
+export function __setGeminiClientFactory(factory) {
+  createGeminiClient = factory
 }
 
+/** Restores the real GoogleGenAI client factory. */
+export function __resetGeminiClientFactory() {
+  createGeminiClient = defaultGeminiClientFactory
+}
+
+const defaultGeminiClientFactory = (apiKey) =>
+  new GoogleGenAI({ apiKey, httpOptions: { timeout: 30000 } })
+
+let createGeminiClient = defaultGeminiClientFactory
+
+/**
+ * Calls the Gemini API Free Tier through the official @google/genai SDK.
+ * The SDK automatically retries transient failures (including 429); once the
+ * retries are exhausted it throws an ApiError carrying the HTTP status.
+ *
+ * Rate limiting (429 / RESOURCE_EXHAUSTED) is surfaced as AI_RATE_LIMITED so the
+ * controller can reply with a friendly "try again later" message.
+ */
 async function callGemini(apiKey, model, userMessage) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
+  try {
+    const client = createGeminiClient(apiKey)
+    const response = await client.models.generateContent({
+      model,
+      contents: userMessage,
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
+        maxOutputTokens: 600,
+        temperature: 0.3,
+      },
+    })
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-      contents: [{ role: 'user', parts: [{ text: userMessage }] }],
-      generationConfig: { maxOutputTokens: 600, temperature: 0.3 },
-    }),
-    signal: AbortSignal.timeout(30000),
-  })
-
-  if (!response.ok) {
-    const err = await response.text()
-    throw new Error(`Gemini API error ${response.status}: ${err}`)
+    return response.text || 'No response received.'
+  } catch (err) {
+    const status = err?.status ?? err?.statusCode ?? 0
+    if (
+      status === 429 ||
+      /(rate limit|RESOURCE_EXHAUSTED)/i.test(String(err?.message || ''))
+    ) {
+      const rl = new Error('Gemini API rate limit exceeded')
+      rl.code = 'AI_RATE_LIMITED'
+      throw rl
+    }
+    throw err
   }
-
-  const data = await response.json()
-  return (
-    data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.'
-  )
 }

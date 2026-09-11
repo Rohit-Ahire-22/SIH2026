@@ -4,6 +4,8 @@ import {
   listScans,
   getScan,
   compareScans,
+  generateRecommendations,
+  getScanRecommendations,
   nutritionUpload,
   handleNutritionUploadError,
 } from '../controllers/nutritionController.js'
@@ -26,6 +28,10 @@ router.get('/scans', listScans)
 
 // Single scan
 router.get('/scans/:id', getScan)
+
+// Recommendations for an owned scan
+router.post('/scans/:id/recommend', generateRecommendations)
+router.get('/scans/:id/recommendations', getScanRecommendations)
 
 // Comparison
 router.get('/compare', compareScans)

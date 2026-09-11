@@ -46,6 +46,31 @@ const nutritionScanSchema = new Schema(
       enum: ['EXTRACTED', 'PARTIAL', 'FAILED'],
       default: 'EXTRACTED',
     },
+    category: {
+      type: String,
+      trim: true,
+    },
+    categoryConfidence: {
+      type: Number,
+      min: 0,
+      max: 1,
+    },
+    lowCategoryConfidence: {
+      type: Boolean,
+      default: false,
+    },
+    recommendationStatus: {
+      type: String,
+      enum: ['recommendations', 'scanned_competitive', 'no_comparable_products', 'failed', 'not_requested'],
+      default: 'not_requested',
+    },
+    recommendations: {
+      type: [Schema.Types.Mixed],
+      default: [],
+    },
+    recommendationGeneratedAt: {
+      type: Date,
+    },
     scannedAt: {
       type: Date,
       default: Date.now,

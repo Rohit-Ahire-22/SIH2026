@@ -1,4 +1,5 @@
 import DashboardHeader from './DashboardHeader'
+import GlobalAiAssistant from '../components/GlobalAiAssistant'
 
 function DashboardLayout({ children }) {
   return (
@@ -13,6 +14,7 @@ function DashboardLayout({ children }) {
           Statement SIH26034
         </div>
       </footer>
+      <GlobalAiAssistant />
     </div>
   )
 }

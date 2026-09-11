@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { Upload, X, ArrowRight, AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { API_URL } from '../config';
@@ -93,8 +93,13 @@ function NewInspectionPage() {
     <DashboardLayout>
       <div className="max-w-4xl mx-auto py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">New Inspection</h1>
-          <p className="text-gray-500">Upload a product label to evaluate its legal metrology compliance.</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">New Inspection</h1>
+              <p className="text-gray-500">Upload a product label to evaluate its legal metrology compliance.</p>
+            </div>
+            <Link to="/" className="text-sm text-gray-500 hover:text-blue-600">← Dashboard</Link>
+          </div>
         </div>
 
         {error && (

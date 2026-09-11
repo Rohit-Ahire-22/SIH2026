@@ -4,6 +4,7 @@ import {
   extractNutritionFromImage,
   compareNutrients,
 } from '../services/nutritionExtractionService.js'
+import { buildRecommendations } from '../services/nutritionRecommendationService.js'
 import {
   uploadProductImageToCloudinary,
   isCloudinaryConfigured,
@@ -145,6 +146,92 @@ export async function getScan(req, res, next) {
     }
 
     return res.status(200).json({ success: true, data: scan })
+  } catch (err) {
+    return next(err)
+  }
+}
+
+/**
+ * POST /api/nutrition/scans/:id/recommend
+ * Generates Open Food Facts–based product recommendations for an owned scan.
+ * Recommendations are persisted with the scan so they can be re-read later.
+ */
+export async function generateRecommendations(req, res, next) {
+  try {
+    const { id } = req.params
+    const userId = req.user.userId
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid scan id' })
+    }
+
+    const scan = await NutritionScan.findOne({ _id: id, userId })
+    if (!scan) {
+      return res.status(404).json({ success: false, message: 'Scan not found' })
+    }
+
+    const result = await buildRecommendations(
+      scan.nutrients,
+      scan.label || '',
+      scan.rawText || '',
+    )
+
+    scan.category = result.category.key
+    scan.categoryConfidence = result.category.confidence
+    scan.lowCategoryConfidence = Boolean(result.lowCategoryConfidence)
+    scan.recommendationStatus = result.status
+    scan.recommendations = result.recommendations || []
+    scan.recommendationGeneratedAt = new Date()
+    await scan.save()
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        scanId: scan._id,
+        category: result.category,
+        status: result.status,
+        recommendations: result.recommendations || [],
+        scannedIsCompetitive: Boolean(result.scannedIsCompetitive),
+        noComparableData: Boolean(result.noComparableData),
+        lowCategoryConfidence: Boolean(result.lowCategoryConfidence),
+        disclaimer: result.disclaimer,
+      },
+    })
+  } catch (err) {
+    return next(err)
+  }
+}
+
+/**
+ * GET /api/nutrition/scans/:id/recommendations
+ * Reads previously generated recommendations for an owned scan.
+ */
+export async function getScanRecommendations(req, res, next) {
+  try {
+    const { id } = req.params
+    const userId = req.user.userId
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid scan id' })
+    }
+
+    const scan = await NutritionScan.findOne({ _id: id, userId })
+      .select('category categoryConfidence lowCategoryConfidence recommendationStatus recommendations recommendationGeneratedAt')
+      .lean()
+    if (!scan) {
+      return res.status(404).json({ success: false, message: 'Scan not found' })
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        scanId: scan._id,
+        category: scan.category ? { key: scan.category } : null,
+        status: scan.recommendationStatus,
+        recommendations: scan.recommendations || [],
+        lowCategoryConfidence: Boolean(scan.lowCategoryConfidence),
+      },
+    })
   } catch (err) {
     return next(err)
   }

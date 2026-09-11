@@ -4,39 +4,74 @@ import {
   isAiChatAvailable,
   buildInspectionContext,
   askComplianceQuestion,
+  describeAiError,
 } from '../services/aiChatService.js'
 
 /**
+ * Sanitises an optional page-level context object provided by the client.
+ * Only allows the minimal, non-sensitive fields the assistant may need.
+ * Anything else is silently dropped.
+ *
+ * @param {unknown} context
+ * @returns {{ page?: string, summary?: string }}
+ */
+export function sanitizeChatContext(context) {
+  const out = {}
+  if (context && typeof context === 'object') {
+    if (typeof context.page === 'string') {
+      const page = context.page.trim().slice(0, 64)
+      if (/^[\w/-]{1,64}$/.test(page)) out.page = page
+    }
+    if (typeof context.summary === 'string') {
+      const summary = context.summary.trim().replace(/[\u0000-\u001f\u007f]/g, ' ').slice(0, 300)
+      if (summary.length > 0) out.summary = summary
+    }
+  }
+  return out
+}
+
+function validateQuestion(q) {
+  const trimmed = String(q || '').trim()
+  if (trimmed.length < 3 || trimmed.length > 1000) {
+    return 'Question must be between 3 and 1000 characters'
+  }
+  return null
+}
+
+/**
  * POST /api/chat/ask
- * Ask the AI assistant a question about an existing inspection.
+ * Ask the AI assistant a question.
+ *
+ * - With `productId`: answers about that inspection (ownership enforced).
+ * - Without `productId`: global page-level chat; optional minimal `context`
+ *   ({ page?, summary? }) is sanitised server-side.
  *
  * The compliance system continues working if this endpoint fails or
  * the AI provider is unavailable.
  *
- * Request body: { productId, question }
+ * Request body: { productId?, context?, question }
  */
 export async function askQuestion(req, res, next) {
   try {
-    const { productId, question } = req.body
+    const { productId, context, question } = req.body
     const userId = req.user.userId
 
-    if (!productId || !question) {
+    if (!question) {
       return res.status(400).json({
         success: false,
-        message: 'productId and question are required',
+        message: 'question is required',
       })
     }
 
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(400).json({ success: false, message: 'Invalid productId' })
+    const questionError = validateQuestion(question)
+    if (questionError) {
+      return res.status(400).json({ success: false, message: questionError })
     }
 
-    const q = String(question).trim()
-    if (q.length < 3 || q.length > 1000) {
-      return res.status(400).json({
-        success: false,
-        message: 'Question must be between 3 and 1000 characters',
-      })
+    if (productId !== undefined && productId !== null && productId !== '') {
+      if (!mongoose.Types.ObjectId.isValid(productId)) {
+        return res.status(400).json({ success: false, message: 'Invalid productId' })
+      }
     }
 
     // If AI is not configured, return graceful unavailable state
@@ -49,28 +84,39 @@ export async function askQuestion(req, res, next) {
       })
     }
 
-    // Ownership check — inspector can only ask about their own products
-    const product = await Product.findOne({ _id: productId, userId }).lean()
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: 'Product not found or access denied',
-      })
+    // Build a safe, minimal context.
+    let aiContext = { page: 'general' }
+    if (productId) {
+      // Ownership check — inspector can only ask about their own products
+      const product = await Product.findOne({ _id: productId, userId }).lean()
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: 'Product not found or access denied',
+        })
+      }
+      aiContext = {
+        page: 'inspection',
+        inspection: buildInspectionContext(product),
+      }
+    } else {
+      const safe = sanitizeChatContext(context)
+      if (Object.keys(safe).length > 0) aiContext = safe
     }
-
-    // Build safe context from persisted data — no raw private info
-    const context = buildInspectionContext(product)
 
     let answer
     try {
-      answer = await askComplianceQuestion(context, q)
+      answer = await askComplianceQuestion(aiContext, String(question).trim())
     } catch (aiErr) {
-      // AI provider error — return safe response, do NOT crash the app
+      // AI provider error — return safe response, do NOT crash the app.
+      // Rate limits get a friendly "try again later" message.
       console.error('[ChatController] AI provider error:', aiErr.message)
+      const mapped = describeAiError(aiErr)
       return res.status(200).json({
         success: true,
         available: false,
-        message: 'AI assistant is temporarily unavailable. Please try again later.',
+        code: mapped.code,
+        message: mapped.message,
       })
     }
 
@@ -85,10 +131,10 @@ export async function askQuestion(req, res, next) {
     return res.status(200).json({
       success: true,
       available: true,
-      question: q,
+      question: String(question).trim(),
       answer,
       disclaimer:
-        'This response is generated by an AI assistant to help explain the inspection data. It does not constitute a legal determination.',
+        'This response is generated by an AI assistant to help explain the system and its inspection data. It does not constitute a legal determination.',
     })
   } catch (err) {
     return next(err)

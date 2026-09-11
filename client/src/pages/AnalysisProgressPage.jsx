@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { API_URL } from '../config';
@@ -70,6 +70,9 @@ function AnalysisProgressPage() {
   return (
     <DashboardLayout>
       <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-2xl mx-auto px-4">
+        <div className="self-start mb-4">
+          <Link to="/" className="text-sm text-gray-500 hover:text-blue-600">← Dashboard</Link>
+        </div>
         
         {error ? (
           <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center w-full shadow-sm">

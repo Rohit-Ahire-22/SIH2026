@@ -3,6 +3,7 @@ import Product from '../models/Product.js'
 import {
   getMapData,
   getAreaSummary,
+  getHighAttentionAreas,
 } from '../services/violationIntelligenceService.js'
 
 /**
@@ -98,9 +99,9 @@ export async function updateProductLocation(req, res, next) {
 export async function getViolationMap(req, res, next) {
   try {
     const userId = req.user.userId
-    const { status, category, from, to } = req.query
+    const { status, category, from, to, manufacturer } = req.query
 
-    const markers = await getMapData(userId, { status, category, from, to })
+    const markers = await getMapData(userId, { status, category, from, to, manufacturer })
 
     return res.status(200).json({
       success: true,
@@ -108,6 +109,38 @@ export async function getViolationMap(req, res, next) {
       meta: {
         count: markers.length,
         note: 'Inspection attention areas — not indicative of confirmed legal violations',
+      },
+    })
+  } catch (err) {
+    return next(err)
+  }
+}
+
+/**
+ * GET /api/violations/high-attention
+ * Returns clustered "high-attention areas" (cells with multiple inspections
+ * including at least one NON_COMPLIANT or REVIEW). Empty when the data is
+ * insufficient to infer a pattern.
+ */
+export async function getHighAttentionAreasController(req, res, next) {
+  try {
+    const userId = req.user.userId
+    const { status, category, from, to, manufacturer } = req.query
+
+    const { areas, hasHighAttentionData } = await getHighAttentionAreas(userId, {
+      status,
+      category,
+      from,
+      to,
+      manufacturer,
+    })
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        areas,
+        hasHighAttentionData,
+        note: 'High-attention areas are based on stored inspection data — they are not confirmed legal violation zones.',
       },
     })
   } catch (err) {

@@ -27,6 +27,11 @@ export const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   mongoUri: process.env.MONGODB_URI,
   aiServiceUrl: process.env.AI_SERVICE_URL || 'http://127.0.0.1:8001',
+  aiChat: {
+    provider: process.env.AI_CHAT_PROVIDER || '',
+    model: process.env.AI_CHAT_MODEL || '',
+    apiKey: process.env.AI_CHAT_API_KEY || '',
+  },
   cloudinary: {
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
     apiKey: process.env.CLOUDINARY_API_KEY,

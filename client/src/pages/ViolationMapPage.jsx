@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Filter, BarChart2, AlertCircle, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { MapPin, Filter, BarChart2, AlertCircle, CheckCircle, XCircle, Clock, MapPinned } from 'lucide-react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { API_URL } from '../config';
 
@@ -39,18 +39,22 @@ function SummaryCard({ icon: Icon, label, value, color }) {
 export default function ViolationMapPage() {
   const [markers, setMarkers] = useState([]);
   const [summary, setSummary] = useState(null);
+  const [highAttention, setHighAttention] = useState(null);
   const [loadingMap, setLoadingMap] = useState(true);
   const [loadingSummary, setLoadingSummary] = useState(true);
+  const [loadingAreas, setLoadingAreas] = useState(true);
   const [error, setError] = useState(null);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [manufacturerFilter, setManufacturerFilter] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
 
   useEffect(() => { fetchSummary(); }, []);
-  useEffect(() => { fetchMarkers(); }, [statusFilter, categoryFilter, fromDate, toDate]);
+  useEffect(() => { fetchMarkers(); }, [statusFilter, categoryFilter, manufacturerFilter, fromDate, toDate]);
+  useEffect(() => { fetchHighAttention(); }, [statusFilter, categoryFilter, manufacturerFilter, fromDate, toDate]);
 
   const fetchMarkers = async () => {
     setLoadingMap(true);
@@ -58,6 +62,7 @@ export default function ViolationMapPage() {
       const q = new URLSearchParams();
       if (statusFilter) q.set('status', statusFilter);
       if (categoryFilter) q.set('category', categoryFilter);
+      if (manufacturerFilter.trim()) q.set('manufacturer', manufacturerFilter.trim());
       if (fromDate) q.set('from', fromDate);
       if (toDate) q.set('to', toDate);
 
@@ -80,6 +85,28 @@ export default function ViolationMapPage() {
       if (res.ok) setSummary(json.data);
     } catch (_) {}
     finally { setLoadingSummary(false); }
+  };
+
+  const fetchHighAttention = async () => {
+    setLoadingAreas(true);
+    try {
+      const q = new URLSearchParams();
+      if (statusFilter) q.set('status', statusFilter);
+      if (categoryFilter) q.set('category', categoryFilter);
+      if (manufacturerFilter.trim()) q.set('manufacturer', manufacturerFilter.trim());
+      if (fromDate) q.set('from', fromDate);
+      if (toDate) q.set('to', toDate);
+
+      const res = await fetch(`${API_URL}/violations/high-attention?${q}`, { credentials: 'include' });
+      const json = await res.json();
+      if (res.ok) setHighAttention(json.data);
+    } catch (_) {}
+    finally { setLoadingAreas(false); }
+  };
+
+  const clearFilters = () => {
+    setStatusFilter(''); setCategoryFilter(''); setManufacturerFilter('');
+    setFromDate(''); setToDate('');
   };
 
   // Default center — India
@@ -140,6 +167,14 @@ export default function ViolationMapPage() {
             {CATEGORIES.map(c => <option key={c} value={c} className="capitalize">{c.replace('_', ' ')}</option>)}
           </select>
 
+          <input
+            type="text"
+            value={manufacturerFilter}
+            onChange={e => setManufacturerFilter(e.target.value)}
+            placeholder="Manufacturer / brand…"
+            className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
+          />
+
           <div className="flex items-center gap-2 text-sm">
             <label className="text-gray-500">From</label>
             <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)}
@@ -150,7 +185,7 @@ export default function ViolationMapPage() {
           </div>
 
           <button
-            onClick={() => { setStatusFilter(''); setCategoryFilter(''); setFromDate(''); setToDate(''); }}
+            onClick={clearFilters}
             className="ml-auto text-xs text-gray-500 hover:text-red-600 underline"
           >Clear filters</button>
         </div>
@@ -208,7 +243,8 @@ export default function ViolationMapPage() {
                     <div className="text-sm space-y-1 min-w-[180px]">
                       <div className="font-bold text-gray-900">{m.productName}</div>
                       <div className="text-gray-500 capitalize">{m.category?.replace('_', ' ')}</div>
-                      {m.brandName && <div className="text-gray-500">{m.brandName}</div>}
+                      {m.manufacturer && <div className="text-gray-500">Manufacturer: {m.manufacturer}</div>}
+                      {m.brandName && !m.manufacturer && <div className="text-gray-500">{m.brandName}</div>}
                       <div className="flex items-center gap-1.5 mt-1">
                         <span
                           className="w-2 h-2 rounded-full inline-block"
@@ -221,6 +257,12 @@ export default function ViolationMapPage() {
                       <div className="text-xs text-gray-400">
                         {new Date(m.inspectionDate).toLocaleDateString('en-IN')}
                       </div>
+                      <div className="text-[11px] text-gray-400 font-mono">
+                        {Number(m.latitude).toFixed(4)}, {Number(m.longitude).toFixed(4)}
+                      </div>
+                      <p className="text-[11px] text-gray-400 italic">
+                        Based on stored inspection data — not a confirmed legal violation.
+                      </p>
                       <Link
                         to={`/inspections/${m.productId}/result`}
                         className="block mt-2 text-xs text-blue-600 hover:underline font-medium"
@@ -257,6 +299,49 @@ export default function ViolationMapPage() {
             </div>
           </div>
         )}
+
+        {/* High-attention areas */}
+        <div className="bg-white border rounded-xl shadow-sm p-5">
+          <h2 className="font-bold text-gray-800 mb-1 flex items-center gap-2">
+            <MapPinned size={18} className="text-amber-500" /> High-Attention Areas
+          </h2>
+          <p className="text-xs text-gray-500 mb-4">
+            Areas where several inspections cluster and at least one is NON-COMPLIANT or REVIEW.
+            Not confirmed legal violation zones.
+          </p>
+
+          {loadingAreas ? (
+            <p className="text-sm text-gray-400">Loading…</p>
+          ) : !highAttention || !highAttention.hasHighAttentionData ? (
+            <div className="flex flex-col items-center py-6 text-gray-400 text-center">
+              <MapPin size={28} className="opacity-40 mb-2" />
+              <p className="text-sm font-medium text-gray-600">No high-attention areas yet</p>
+              <p className="text-xs mt-1 max-w-xl">
+                With more location-tagged inspections we can identify areas that warrant closer attention.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {highAttention.areas.map((area, i) => (
+                <div key={i} className="border rounded-xl p-4 border-amber-200 bg-amber-50/50">
+                  <div className="text-xs text-gray-500 font-mono">
+                    {area.center.latitude.toFixed(3)}, {area.center.longitude.toFixed(3)}
+                  </div>
+                  <div className="mt-1 flex items-center gap-2">
+                    <span className="text-2xl font-black text-amber-700">{area.attentionScore}</span>
+                    <span className="text-xs text-gray-600">attention point{area.attentionScore !== 1 ? 's' : ''}</span>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
+                    <span className="bg-white border border-gray-200 rounded-full px-2 py-0.5 text-gray-700">{area.count} inspections</span>
+                    {area.nonCompliant > 0 && <span className="bg-red-100 text-red-700 border border-red-200 rounded-full px-2 py-0.5">{area.nonCompliant} NC</span>}
+                    {area.review > 0 && <span className="bg-amber-100 text-amber-700 border border-amber-200 rounded-full px-2 py-0.5">{area.review} Review</span>}
+                    {area.compliant > 0 && <span className="bg-green-100 text-green-700 border border-green-200 rounded-full px-2 py-0.5">{area.compliant} Compliant</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </DashboardLayout>
   );

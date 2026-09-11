@@ -4,7 +4,6 @@ import { ArrowLeft, CheckCircle, XCircle, AlertCircle, LayoutDashboard, Calendar
 import DashboardLayout from '../layouts/DashboardLayout';
 import ExtractedFieldsPanel from '../components/ocr/ExtractedFieldsPanel';
 import OcrImageViewer from '../components/ocr/OcrImageViewer';
-import AiAssistantPanel from '../components/AiAssistantPanel';
 import { API_URL } from '../config';
 
 // ─── Location capture state ───────────────────────────────────────────────────
@@ -420,12 +419,6 @@ function ComplianceResultPage() {
             })}
           </div>
         </div>
-
-        {/* AI Compliance Assistant */}
-        {analysisStatus === 'COMPLETED' && (
-          <AiAssistantPanel productId={id} />
-        )}
-
       </div>
     </DashboardLayout>
   );
